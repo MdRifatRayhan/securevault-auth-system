@@ -178,6 +178,7 @@ async function login() {
 
   const res = await fetch("/api/login", {
     method:"POST",
+    credentials:"include",
     headers:{
       "Content-Type":"application/json",
       "CSRF-Token":token
@@ -203,6 +204,7 @@ async function verifyOtp() {
 
   const res = await fetch("/api/verify-otp", {
     method:"POST",
+    credentials:"include",
     headers:{
       "Content-Type":"application/json",
       "CSRF-Token":token
@@ -228,6 +230,7 @@ async function forgot() {
 
   const res = await fetch("/api/forgot-password", {
     method:"POST",
+    credentials:"include",
     headers:{
       "Content-Type":"application/json",
       "CSRF-Token":token
@@ -249,6 +252,7 @@ async function resetPassword() {
 
   const res = await fetch("/api/reset-password", {
     method:"POST",
+    credentials:"include",
     headers:{
       "Content-Type":"application/json",
       "CSRF-Token":token
