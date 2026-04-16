@@ -15,7 +15,7 @@ const csrfProtection = csurf({ cookie: true });
 const SECRET = "mysecretkey";
 
 /* DB */
-mongoose.connect("mongodb+srv://admin:fI27hhJbWUQhh9XQ@cluster0.cw6dvem.mongodb.net/?securevault=Cluster0")
+mongoose.connect("mongodb+srv://admin:fI27hhJbWUQhh9XQ@cluster0.cw6dvem.mongodb.net/securevault?retryWrites=true&w=majority")
 .then(()=>console.log("MongoDB Connected"))
 .catch(err=>console.log(err));
 
