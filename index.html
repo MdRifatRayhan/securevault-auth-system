@@ -261,6 +261,11 @@ async function verifyOtp() {
 async function forgot() {
   const token = await getCSRF();
 
+  if (!user.value) {
+    msg.innerText = "Enter username first";
+    return;
+  }
+
   const res = await fetch("/api/forgot-password", {
     method:"POST",
     credentials:"include",
@@ -269,7 +274,7 @@ async function forgot() {
       "CSRF-Token":token
     },
     body:JSON.stringify({
-      email:"demo@mail.com"
+      username: user.value
     })
   });
 

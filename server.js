@@ -23,12 +23,12 @@ mongoose.connect("mongodb+srv://admin:fI27hhJbWUQhh9XQ@cluster0.cw6dvem.mongodb.
 const User = mongoose.model("User", {
   username: String,
   email: String,
-  password: String
+  password: String,
+  resetToken: String   // ✅ NEW
 });
 
 /* TEMP */
 let currentOTP = "";
-let resetToken = "";
 
 /* CSRF */
 app.get("/api/csrf-token", csrfProtection, (req, res) => {
@@ -57,7 +57,6 @@ app.post("/api/login", csrfProtection, async (req, res) => {
 
   if (!ok) return res.json({ success: false, message: "Wrong password" });
 
-  // ✅ RANDOM OTP
   currentOTP = Math.floor(100000 + Math.random() * 900000).toString();
   console.log("OTP:", currentOTP);
 
@@ -83,21 +82,35 @@ app.post("/api/verify-otp", csrfProtection, (req, res) => {
   res.json({ success: false, message: "Wrong OTP" });
 });
 
-/* FORGOT PASSWORD */
-app.post("/api/forgot-password", csrfProtection, (req, res) => {
-  const { email } = req.body;
+/* 🔥 FIXED FORGOT PASSWORD */
+app.post("/api/forgot-password", csrfProtection, async (req, res) => {
+  const { username } = req.body;
 
-  resetToken = Math.random().toString(36).substring(2);
-  console.log("Reset Token:", resetToken);
+  const user = await User.findOne({ username });
 
-  res.json({ success: true, message: "Check terminal for reset token" });
+  if (!user) {
+    return res.json({ success: false, message: "User not found" });
+  }
+
+  const token = Math.random().toString(36).substring(2);
+
+  user.resetToken = token;
+  await user.save();
+
+  console.log("Reset Token:", token);
+
+  res.json({ success: true, message: "Reset token generated" });
 });
+
+/* 🔥 FIXED RESET PASSWORD */
 app.post("/api/reset-password", csrfProtection, async (req, res) => {
   const { token, newPassword } = req.body;
 
-  console.log("Reset request:", token, newPassword); // DEBUG
+  console.log("Reset request:", token);
 
-  if (token !== resetToken) {
+  const user = await User.findOne({ resetToken: token });
+
+  if (!user) {
     return res.json({
       success: false,
       message: "Invalid token"
@@ -111,15 +124,12 @@ app.post("/api/reset-password", csrfProtection, async (req, res) => {
     });
   }
 
-  // ✅ HASHING হচ্ছে এখানে
   const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-  await User.updateOne(
-    { username: "demo" },
-    { password: hashedPassword }
-  );
+  user.password = hashedPassword;
+  user.resetToken = null;
 
-  resetToken = "";
+  await user.save();
 
   res.json({
     success: true,
