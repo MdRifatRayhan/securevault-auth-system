@@ -24,7 +24,9 @@ const User = mongoose.model("User", {
   username: String,
   email: String,
   password: String,
-  resetToken: String   // ✅ NEW
+  resetToken: String,
+  loginAttempts: { type: Number, default: 0 },
+  lockUntil: { type: Number, default: 0 }
 });
 
 /* TEMP */
@@ -51,16 +53,50 @@ app.post("/api/login", csrfProtection, async (req, res) => {
 
   const user = await User.findOne({ username });
 
-  if (!user) return res.json({ success: false, message: "User not found" });
+  if (!user) {
+    return res.json({ success: false, message: "User not found" });
+  }
+
+  // 🔒 check lock
+  if (user.lockUntil && user.lockUntil > Date.now()) {
+    return res.json({
+      success: false,
+      message: "Account locked. Try again later"
+    });
+  }
 
   const ok = await bcrypt.compare(password, user.password);
 
-  if (!ok) return res.json({ success: false, message: "Wrong password" });
+  if (!ok) {
+    user.loginAttempts += 1;
 
+    // 🔥 lock after 3 attempts
+    if (user.loginAttempts >= 3) {
+      user.lockUntil = Date.now() + 5 * 60 * 1000; // 5 minutes
+      user.loginAttempts = 0;
+    }
+
+    await user.save();
+
+    return res.json({
+      success: false,
+      message: "Wrong password"
+    });
+  }
+
+  // ✅ success হলে reset counter
+  user.loginAttempts = 0;
+  user.lockUntil = 0;
+  await user.save();
+
+  // OTP generate
   currentOTP = Math.floor(100000 + Math.random() * 900000).toString();
   console.log("OTP:", currentOTP);
 
-  res.json({ success: true, message: "OTP sent" });
+  res.json({
+    success: true,
+    message: "OTP sent"
+  });
 });
 
 /* VERIFY OTP */
