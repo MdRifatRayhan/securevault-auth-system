@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const csurf = require("csurf");
 const cookieParser = require("cookie-parser");
+const xss = require("xss");
 
 const app = express();
 
@@ -39,7 +40,11 @@ app.get("/api/csrf-token", csrfProtection, (req, res) => {
 
 /* REGISTER */
 app.post("/api/register", csrfProtection, async (req, res) => {
-  const { username, email, password } = req.body;
+  let { username, email, password } = req.body;
+
+username = xss(username);
+email = xss(email);
+password = xss(password);
 
   const hash = await bcrypt.hash(password, 10);
   await User.create({ username, email, password: hash });
@@ -49,7 +54,10 @@ app.post("/api/register", csrfProtection, async (req, res) => {
 
 /* LOGIN */
 app.post("/api/login", csrfProtection, async (req, res) => {
-  const { username, password } = req.body;
+  let { username, password } = req.body;
+
+username = xss(username);
+password = xss(password);
 
   const user = await User.findOne({ username });
 
@@ -121,7 +129,8 @@ app.post("/api/verify-otp", csrfProtection, (req, res) => {
 /* 🔥 FIXED FORGOT PASSWORD */
 app.post("/api/forgot-password", csrfProtection, async (req, res) => {
   const { username } = req.body;
-
+let { username } = req.body;
+username = xss(username);
   const user = await User.findOne({ username });
 
   if (!user) {
@@ -140,7 +149,10 @@ app.post("/api/forgot-password", csrfProtection, async (req, res) => {
 
 /* 🔥 FIXED RESET PASSWORD */
 app.post("/api/reset-password", csrfProtection, async (req, res) => {
-  const { token, newPassword } = req.body;
+  let { token, newPassword } = req.body;
+
+token = xss(token);
+newPassword = xss(newPassword);
 
   console.log("Reset request:", token);
 
