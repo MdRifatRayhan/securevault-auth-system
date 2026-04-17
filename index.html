@@ -1,191 +1,148 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>SecureVault Pro</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SecureVault</title>
 
 <style>
-* {
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-}
-
 body {
-  font-family: Arial;
-  height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  background: linear-gradient(270deg,#667eea,#764ba2,#00c6ff);
-  background-size: 600% 600%;
-  animation: gradient 10s ease infinite;
-}
-
-@keyframes gradient {
-  0% {background-position:0% 50%;}
-  50% {background-position:100% 50%;}
-  100% {background-position:0% 50%;}
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #1e1e2f, #3a3a6a);
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
 }
 
 .card {
-  width:380px;
-  padding:30px;
-  border-radius:20px;
-  background: rgba(255,255,255,0.1);
-  backdrop-filter: blur(20px);
-  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-  color:white;
-  transition:0.3s;
+  width: 350px;
+  padding: 30px;
+  border-radius: 15px;
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 30px rgba(0,0,0,0.5);
+  text-align: center;
+  animation: fadeIn 0.5s ease;
 }
 
-.card:hover {
-  transform: scale(1.02);
-}
-
-h2, h3 {
-  text-align:center;
-  margin-bottom:10px;
+h1 {
+  margin-bottom: 20px;
 }
 
 input {
-  width:100%;
-  padding:12px;
-  margin:8px 0;
-  border:none;
-  border-radius:10px;
-  outline:none;
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border-radius: 8px;
+  border: none;
+  outline: none;
 }
 
 button {
-  width:100%;
-  padding:12px;
-  margin-top:10px;
-  border:none;
-  border-radius:10px;
-  background:#00c6ff;
-  color:white;
-  font-weight:bold;
-  cursor:pointer;
-  transition:0.3s;
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 8px;
+  background: #00c6ff;
+  color: black;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
 }
 
 button:hover {
-  background:#0072ff;
-  transform: translateY(-2px);
-}
-
-.secondary {
-  background:transparent;
-  border:1px solid white;
-}
-
-.secondary:hover {
-  background:white;
-  color:black;
+  background: #00a2d3;
 }
 
 #msg {
-  text-align:center;
-  margin-top:10px;
-  font-size:14px;
+  margin-top: 10px;
+  font-size: 14px;
 }
 
-/* toggle switch */
-.toggle {
-  display:flex;
-  justify-content:flex-end;
-  margin-bottom:10px;
+.link {
+  margin-top: 10px;
+  cursor: pointer;
+  color: #00c6ff;
+  font-size: 13px;
 }
 
-.toggle input {
-  margin-left:5px;
+.hidden {
+  display: none;
 }
 
-/* dark mode */
-.dark {
-  background: black !important;
+@keyframes fadeIn {
+  from {opacity: 0; transform: translateY(10px);}
+  to {opacity: 1; transform: translateY(0);}
 }
 </style>
 </head>
 
 <body>
 
-<div class="card" id="card">
+<div class="card">
 
-<div class="toggle">
-<label>🌙</label>
-<input type="checkbox" onclick="toggleMode()">
-</div>
+  <!-- LOGIN -->
+  <div id="loginBox">
+    <h1>🔐 SecureVault</h1>
+    <input id="user" placeholder="Username">
+    <input id="pass" type="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <div class="link" onclick="showForgot()">Forgot Password?</div>
+  </div>
 
-<!-- LOGIN -->
-<div id="loginBox">
-<h2>🔐 SecureVault</h2>
-<input id="user" placeholder="Username">
-<input id="pass" type="password" placeholder="Password">
-<button onclick="togglePass()">👁 Show/Hide Password</button>
-<button onclick="login()">Login</button>
-<button class="secondary" onclick="forgot()">Forgot Password</button>
-</div>
+  <!-- OTP -->
+  <div id="otpBox" class="hidden">
+    <h1>Enter OTP</h1>
+    <input id="otp" placeholder="Enter OTP">
+    <button onclick="verifyOtp()">Verify OTP</button>
+  </div>
 
-<!-- OTP -->
-<div id="otpBox" style="display:none;">
-<h2>🔢 Enter OTP</h2>
-<input id="otp" placeholder="Enter OTP">
-<button onclick="verifyOtp()">Verify OTP</button>
-</div>
+  <!-- DASHBOARD -->
+  <div id="dashboard" class="hidden">
+    <h1>✅ Welcome</h1>
+    <p>Secure Login Successful</p>
+    <button onclick="logout()">Logout</button>
+  </div>
 
-<!-- DASHBOARD -->
-<div id="dashboard" style="display:none;">
-<h2>✅ Welcome</h2>
-<p>Secure Login Successful</p>
-<button onclick="logout()">Logout</button>
-</div>
+  <!-- FORGOT -->
+  <div id="forgotBox" class="hidden">
+    <h1>Reset Password</h1>
+    <input id="resetToken" placeholder="Enter Token">
+    <input id="newPass" placeholder="New Password">
+    <button onclick="resetPassword()">Reset</button>
+  </div>
 
-<!-- RESET -->
-<div id="resetBox" style="display:none;">
-<h3>🔁 Reset Password</h3>
-<input id="resetToken" placeholder="Enter token">
-<input id="newPass" type="password" placeholder="New password">
-<button onclick="resetPassword()">Reset Password</button>
-</div>
-
-<p id="msg"></p>
+  <p id="msg"></p>
 
 </div>
 
 <script>
 
+// CSRF token
 async function getCSRF() {
   const res = await fetch("/api/csrf-token");
   const data = await res.json();
   return data.csrfToken;
 }
 
-/* PASSWORD TOGGLE */
-function togglePass() {
-  const p = document.getElementById("pass");
-  p.type = p.type === "password" ? "text" : "password";
-}
-
-/* DARK MODE */
-function toggleMode() {
-  document.body.classList.toggle("dark");
-}
-
-/* LOGIN */
+// LOGIN
 async function login() {
   const token = await getCSRF();
 
   const res = await fetch("/api/login", {
-    method:"POST",
-    credentials:"include",
-    headers:{
-      "Content-Type":"application/json",
-      "CSRF-Token":token
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      "CSRF-Token": token
     },
-    body:JSON.stringify({
-      username:user.value,
-      password:pass.value
+    body: JSON.stringify({
+      username: user.value,
+      password: pass.value
     })
   });
 
@@ -193,24 +150,24 @@ async function login() {
   msg.innerText = data.message;
 
   if (data.success) {
-    loginBox.style.display="none";
-    otpBox.style.display="block";
+    loginBox.classList.add("hidden");
+    otpBox.classList.remove("hidden");
   }
 }
 
-/* OTP */
+// VERIFY OTP
 async function verifyOtp() {
   const token = await getCSRF();
 
   const res = await fetch("/api/verify-otp", {
-    method:"POST",
-    credentials:"include",
-    headers:{
-      "Content-Type":"application/json",
-      "CSRF-Token":token
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      "CSRF-Token": token
     },
-    body:JSON.stringify({
-      otp:otp.value
+    body: JSON.stringify({
+      otp: otp.value
     })
   });
 
@@ -218,72 +175,42 @@ async function verifyOtp() {
   msg.innerText = data.message;
 
   if (data.success) {
-    localStorage.setItem("token", data.token);
-    otpBox.style.display="none";
-    dashboard.style.display="block";
+    otpBox.classList.add("hidden");
+    dashboard.classList.remove("hidden");
   }
 }
 
-/* FORGOT */
-async function forgot() {
-  const token = await getCSRF();
-
-  const res = await fetch("/api/forgot-password", {
-    method:"POST",
-    credentials:"include",
-    headers:{
-      "Content-Type":"application/json",
-      "CSRF-Token":token
-    },
-    body:JSON.stringify({
-      email:"demo@mail.com"
-    })
-  });
-
-  const data = await res.json();
-  msg.innerText = data.message;
-
-  resetBox.style.display="block";
-}
-
-/* RESET */
+// RESET PASSWORD
 async function resetPassword() {
   const token = await getCSRF();
 
   const res = await fetch("/api/reset-password", {
-    method:"POST",
-    credentials:"include",
-    headers:{
-      "Content-Type":"application/json",
-      "CSRF-Token":token
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      "CSRF-Token": token
     },
-    body:JSON.stringify({
-      token:resetToken.value,
-      newPassword:newPass.value
+    body: JSON.stringify({
+      token: resetToken.value,
+      newPassword: newPass.value
     })
   });
 
   const data = await res.json();
   msg.innerText = data.message;
-
-  if (data.success) {
-    resetBox.style.display="none";
-    loginBox.style.display="block";
-  }
 }
 
-/* LOGOUT */
+// SHOW FORGOT
+function showForgot() {
+  loginBox.classList.add("hidden");
+  forgotBox.classList.remove("hidden");
+}
+
+// LOGOUT
 function logout() {
   localStorage.removeItem("token");
   location.reload();
-}
-
-/* AUTO LOGIN */
-window.onload = () => {
-  if (localStorage.getItem("token")) {
-    loginBox.style.display="none";
-    dashboard.style.display="block";
-  }
 }
 
 </script>
