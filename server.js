@@ -32,6 +32,7 @@ const User = mongoose.model("User", {
 
 /* TEMP */
 let currentOTP = "";
+let otpTime = 0;
 
 /* CSRF */
 app.get("/api/csrf-token", csrfProtection, (req, res) => {
@@ -40,7 +41,47 @@ app.get("/api/csrf-token", csrfProtection, (req, res) => {
 
 /* REGISTER */
 app.post("/api/register", csrfProtection, async (req, res) => {
+
   let { username, email, password } = req.body;
+
+  // ✅ XSS sanitize
+  const xss = require("xss");
+  username = xss(username);
+  email = xss(email);
+  password = xss(password);
+
+  // ❗ empty check
+  if (!username || !password) {
+    return res.json({
+      success: false,
+      message: "All fields required"
+    });
+  }
+
+  // ❗ duplicate check (NEW 🔥)
+  const existing = await User.findOne({ username });
+
+  if (existing) {
+    return res.json({
+      success: false,
+      message: "Username already exists"
+    });
+  }
+
+  // password length
+  if (password.length < 8) {
+    return res.json({
+      success: false,
+      message: "Password must be at least 8 characters"
+    });
+  }
+
+  const hash = await bcrypt.hash(password, 10);
+
+  await User.create({ username, email, password: hash });
+
+  res.json({ success: true, message: "Registered" });
+});
 
 username = xss(username);
 email = xss(email);
@@ -54,7 +95,20 @@ password = xss(password);
 
 /* LOGIN */
 app.post("/api/login", csrfProtection, async (req, res) => {
+
   let { username, password } = req.body;
+
+  const xss = require("xss");
+  username = xss(username);
+  password = xss(password);
+
+  // ❗ empty check (NEW)
+  if (!username || !password) {
+    return res.json({
+      success: false,
+      message: "All fields required"
+    });
+  }
 
 username = xss(username);
 password = xss(password);
@@ -99,6 +153,7 @@ password = xss(password);
 
   // OTP generate
   currentOTP = Math.floor(100000 + Math.random() * 900000).toString();
+  otpTime = Date.now();
   console.log("OTP:", currentOTP);
 
   res.json({
@@ -112,6 +167,12 @@ app.post("/api/verify-otp", csrfProtection, (req, res) => {
   const { otp } = req.body;
 
   console.log("Entered OTP:", otp);
+  if (Date.now() - otpTime > 2 * 60 * 1000) {
+  return res.json({
+    success: false,
+    message: "OTP expired"
+  });
+}
 
   if (otp === currentOTP) {
     const token = jwt.sign({ user: "demo" }, SECRET);
@@ -128,7 +189,19 @@ app.post("/api/verify-otp", csrfProtection, (req, res) => {
 
 /* 🔥 FIXED FORGOT PASSWORD */
 app.post("/api/forgot-password", csrfProtection, async (req, res) => {
-  const { username } = req.body;
+
+  let { username } = req.body;
+
+  const xss = require("xss");
+  username = xss(username);
+
+  // ❗ empty check
+  if (!username) {
+    return res.json({
+      success: false,
+      message: "Enter username"
+    });
+  }
 let { username } = req.body;
 username = xss(username);
   const user = await User.findOne({ username });
