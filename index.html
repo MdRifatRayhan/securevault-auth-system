@@ -1,60 +1,88 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SecureVault</title>
+<title>SecureVault Pro</title>
 
 <style>
+* {
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
 body {
-  margin: 0;
-  font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(135deg, #1e1e2f, #3a3a6a);
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: white;
+  font-family: Arial;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background: linear-gradient(270deg,#667eea,#764ba2,#00c6ff);
+  background-size: 600% 600%;
+  animation: gradient 10s ease infinite;
+}
+
+@keyframes gradient {
+  0% {background-position:0% 50%;}
+  50% {background-position:100% 50%;}
+  100% {background-position:0% 50%;}
 }
 
 .card {
-  width: 350px;
-  padding: 30px;
-  border-radius: 15px;
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 0 30px rgba(0,0,0,0.5);
-  text-align: center;
+  width:380px;
+  padding:30px;
+  border-radius:20px;
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+  color:white;
+}
+
+h2, h3 {
+  text-align:center;
+  margin-bottom:10px;
 }
 
 input {
-  width: 100%;
-  padding: 12px;
-  margin: 8px 0;
-  border-radius: 8px;
-  border: none;
+  width:100%;
+  padding:12px;
+  margin:8px 0;
+  border:none;
+  border-radius:10px;
 }
 
 button {
-  width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-  border: none;
-  border-radius: 8px;
-  background: #00c6ff;
-  color: black;
-  font-weight: bold;
-  cursor: pointer;
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border:none;
+  border-radius:10px;
+  background:#00c6ff;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
 }
 
-.link {
-  margin-top: 10px;
-  cursor: pointer;
-  color: #00c6ff;
-  font-size: 13px;
+.secondary {
+  background:transparent;
+  border:1px solid white;
 }
 
-.hidden { display: none; }
+#msg {
+  text-align:center;
+  margin-top:10px;
+  font-size:14px;
+}
+
+.toggle {
+  display:flex;
+  justify-content:flex-end;
+  margin-bottom:10px;
+}
+
+/* hidden helper */
+.hidden {
+  display:none;
+}
 </style>
 </head>
 
@@ -62,44 +90,52 @@ button {
 
 <div class="card">
 
+<div class="toggle">
+<label>🌙</label>
+<input type="checkbox" onclick="toggleMode()">
+</div>
+
 <!-- LOGIN -->
 <div id="loginBox">
-  <h2>Login</h2>
-  <input id="user" placeholder="Username">
-  <input id="pass" type="password" placeholder="Password">
-  <button onclick="login()">Login</button>
-  <div class="link" onclick="showRegister()">Create Account</div>
-  <div class="link" onclick="showForgot()">Forgot Password?</div>
+<h2>🔐 SecureVault</h2>
+<input id="user" placeholder="Username">
+<input id="pass" type="password" placeholder="Password">
+<button onclick="togglePass()">👁 Show/Hide Password</button>
+<button onclick="login()">Login</button>
+
+<button class="secondary" onclick="showRegister()">Create Account</button>
+<button class="secondary" onclick="forgot()">Forgot Password</button>
 </div>
 
 <!-- REGISTER -->
 <div id="registerBox" class="hidden">
-  <h2>Register</h2>
-  <input id="regUser" placeholder="Username">
-  <input id="regPass" type="password" placeholder="Password">
-  <button onclick="register()">Register</button>
-  <div class="link" onclick="showLogin()">Back to Login</div>
+<h2>🆕 Create Account</h2>
+<input id="regUser" placeholder="Username">
+<input id="regPass" type="password" placeholder="Password (min 8 chars)">
+<button onclick="register()">Register</button>
+<button class="secondary" onclick="showLogin()">Back to Login</button>
 </div>
 
 <!-- OTP -->
 <div id="otpBox" class="hidden">
-  <h2>Enter OTP</h2>
-  <input id="otp" placeholder="OTP">
-  <button onclick="verifyOtp()">Verify</button>
+<h2>🔢 Enter OTP</h2>
+<input id="otp" placeholder="Enter OTP">
+<button onclick="verifyOtp()">Verify OTP</button>
 </div>
 
 <!-- DASHBOARD -->
 <div id="dashboard" class="hidden">
-  <h2>✅ Welcome</h2>
-  <button onclick="logout()">Logout</button>
+<h2>✅ Welcome</h2>
+<p>Secure Login Successful</p>
+<button onclick="logout()">Logout</button>
 </div>
 
-<!-- FORGOT -->
-<div id="forgotBox" class="hidden">
-  <h2>Reset Password</h2>
-  <input id="resetToken" placeholder="Token">
-  <input id="newPass" placeholder="New Password">
-  <button onclick="resetPassword()">Reset</button>
+<!-- RESET -->
+<div id="resetBox" class="hidden">
+<h3>🔁 Reset Password</h3>
+<input id="resetToken" placeholder="Enter token">
+<input id="newPass" type="password" placeholder="New password">
+<button onclick="resetPassword()">Reset Password</button>
 </div>
 
 <p id="msg"></p>
@@ -108,48 +144,82 @@ button {
 
 <script>
 
-// CSRF
 async function getCSRF() {
   const res = await fetch("/api/csrf-token");
   const data = await res.json();
   return data.csrfToken;
 }
 
-// REGISTER
+/* PASSWORD TOGGLE */
+function togglePass() {
+  pass.type = pass.type === "password" ? "text" : "password";
+}
+
+/* DARK MODE */
+function toggleMode() {
+  document.body.classList.toggle("dark");
+}
+
+/* NAVIGATION */
+function showRegister() {
+  loginBox.classList.add("hidden");
+  registerBox.classList.remove("hidden");
+}
+
+function showLogin() {
+  registerBox.classList.add("hidden");
+  resetBox.classList.add("hidden");
+  loginBox.classList.remove("hidden");
+}
+
+/* REGISTER */
 async function register() {
+
+  if (regPass.value.length < 8) {
+    msg.innerText = "Password must be at least 8 characters";
+    return;
+  }
+
   const token = await getCSRF();
 
   const res = await fetch("/api/register", {
-    method: "POST",
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      "CSRF-Token": token
+    method:"POST",
+    credentials:"include",
+    headers:{
+      "Content-Type":"application/json",
+      "CSRF-Token":token
     },
-    body: JSON.stringify({
-      username: regUser.value,
-      password: regPass.value
+    body:JSON.stringify({
+      username:regUser.value,
+      password:regPass.value
     })
   });
 
   const data = await res.json();
   msg.innerText = data.message;
+
+  // auto go back to login
+  if (data.message.toLowerCase().includes("success")) {
+    setTimeout(() => {
+      showLogin();
+    }, 1000);
+  }
 }
 
-// LOGIN
+/* LOGIN */
 async function login() {
   const token = await getCSRF();
 
   const res = await fetch("/api/login", {
-    method: "POST",
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      "CSRF-Token": token
+    method:"POST",
+    credentials:"include",
+    headers:{
+      "Content-Type":"application/json",
+      "CSRF-Token":token
     },
-    body: JSON.stringify({
-      username: user.value,
-      password: pass.value
+    body:JSON.stringify({
+      username:user.value,
+      password:pass.value
     })
   });
 
@@ -162,19 +232,19 @@ async function login() {
   }
 }
 
-// VERIFY OTP
+/* OTP */
 async function verifyOtp() {
   const token = await getCSRF();
 
   const res = await fetch("/api/verify-otp", {
-    method: "POST",
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      "CSRF-Token": token
+    method:"POST",
+    credentials:"include",
+    headers:{
+      "Content-Type":"application/json",
+      "CSRF-Token":token
     },
-    body: JSON.stringify({
-      otp: otp.value
+    body:JSON.stringify({
+      otp:otp.value
     })
   });
 
@@ -187,44 +257,54 @@ async function verifyOtp() {
   }
 }
 
-// RESET
-async function resetPassword() {
+/* FORGOT */
+async function forgot() {
   const token = await getCSRF();
 
-  const res = await fetch("/api/reset-password", {
-    method: "POST",
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      "CSRF-Token": token
+  const res = await fetch("/api/forgot-password", {
+    method:"POST",
+    credentials:"include",
+    headers:{
+      "Content-Type":"application/json",
+      "CSRF-Token":token
     },
-    body: JSON.stringify({
-      token: resetToken.value,
-      newPassword: newPass.value
+    body:JSON.stringify({
+      email:"demo@mail.com"
     })
   });
 
   const data = await res.json();
   msg.innerText = data.message;
+
+  resetBox.classList.remove("hidden");
 }
 
-// NAVIGATION
-function showRegister() {
-  loginBox.classList.add("hidden");
-  registerBox.classList.remove("hidden");
+/* RESET */
+async function resetPassword() {
+  const token = await getCSRF();
+
+  const res = await fetch("/api/reset-password", {
+    method:"POST",
+    credentials:"include",
+    headers:{
+      "Content-Type":"application/json",
+      "CSRF-Token":token
+    },
+    body:JSON.stringify({
+      token:resetToken.value,
+      newPassword:newPass.value
+    })
+  });
+
+  const data = await res.json();
+  msg.innerText = data.message;
+
+  if (data.success) {
+    showLogin();
+  }
 }
 
-function showLogin() {
-  registerBox.classList.add("hidden");
-  loginBox.classList.remove("hidden");
-}
-
-function showForgot() {
-  loginBox.classList.add("hidden");
-  forgotBox.classList.remove("hidden");
-}
-
-// LOGOUT
+/* LOGOUT */
 function logout() {
   localStorage.removeItem("token");
   location.reload();
