@@ -44,50 +44,26 @@ app.post("/api/register", csrfProtection, async (req, res) => {
 
   let { username, email, password } = req.body;
 
-  // ✅ XSS sanitize
-  const xss = require("xss");
   username = xss(username);
   email = xss(email);
   password = xss(password);
 
-  // ❗ empty check
   if (!username || !password) {
-    return res.json({
-      success: false,
-      message: "All fields required"
-    });
+    return res.json({ success: false, message: "All fields required" });
   }
 
-  // ❗ duplicate check (NEW 🔥)
   const existing = await User.findOne({ username });
 
   if (existing) {
-    return res.json({
-      success: false,
-      message: "Username already exists"
-    });
+    return res.json({ success: false, message: "Username already exists" });
   }
 
-  // password length
   if (password.length < 8) {
-    return res.json({
-      success: false,
-      message: "Password must be at least 8 characters"
-    });
+    return res.json({ success: false, message: "Password must be at least 8 characters" });
   }
 
   const hash = await bcrypt.hash(password, 10);
 
-  await User.create({ username, email, password: hash });
-
-  res.json({ success: true, message: "Registered" });
-});
-
-username = xss(username);
-email = xss(email);
-password = xss(password);
-
-  const hash = await bcrypt.hash(password, 10);
   await User.create({ username, email, password: hash });
 
   res.json({ success: true, message: "Registered" });
@@ -98,20 +74,12 @@ app.post("/api/login", csrfProtection, async (req, res) => {
 
   let { username, password } = req.body;
 
-  const xss = require("xss");
   username = xss(username);
   password = xss(password);
 
-  // ❗ empty check (NEW)
   if (!username || !password) {
-    return res.json({
-      success: false,
-      message: "All fields required"
-    });
+    return res.json({ success: false, message: "All fields required" });
   }
-
-username = xss(username);
-password = xss(password);
 
   const user = await User.findOne({ username });
 
@@ -119,7 +87,6 @@ password = xss(password);
     return res.json({ success: false, message: "User not found" });
   }
 
-  // 🔒 check lock
   if (user.lockUntil && user.lockUntil > Date.now()) {
     return res.json({
       success: false,
@@ -132,34 +99,26 @@ password = xss(password);
   if (!ok) {
     user.loginAttempts += 1;
 
-    // 🔥 lock after 3 attempts
     if (user.loginAttempts >= 3) {
-      user.lockUntil = Date.now() + 5 * 60 * 1000; // 5 minutes
+      user.lockUntil = Date.now() + 5 * 60 * 1000;
       user.loginAttempts = 0;
     }
 
     await user.save();
 
-    return res.json({
-      success: false,
-      message: "Wrong password"
-    });
+    return res.json({ success: false, message: "Wrong password" });
   }
 
-  // ✅ success হলে reset counter
   user.loginAttempts = 0;
   user.lockUntil = 0;
   await user.save();
 
-  // OTP generate
   currentOTP = Math.floor(100000 + Math.random() * 900000).toString();
   otpTime = Date.now();
+
   console.log("OTP:", currentOTP);
 
-  res.json({
-    success: true,
-    message: "OTP sent"
-  });
+  res.json({ success: true, message: "OTP sent" });
 });
 
 /* VERIFY OTP */
@@ -167,12 +126,10 @@ app.post("/api/verify-otp", csrfProtection, (req, res) => {
   const { otp } = req.body;
 
   console.log("Entered OTP:", otp);
+
   if (Date.now() - otpTime > 2 * 60 * 1000) {
-  return res.json({
-    success: false,
-    message: "OTP expired"
-  });
-}
+    return res.json({ success: false, message: "OTP expired" });
+  }
 
   if (otp === currentOTP) {
     const token = jwt.sign({ user: "demo" }, SECRET);
@@ -187,23 +144,17 @@ app.post("/api/verify-otp", csrfProtection, (req, res) => {
   res.json({ success: false, message: "Wrong OTP" });
 });
 
-/* 🔥 FIXED FORGOT PASSWORD */
+/* FORGOT PASSWORD */
 app.post("/api/forgot-password", csrfProtection, async (req, res) => {
 
   let { username } = req.body;
 
-  const xss = require("xss");
   username = xss(username);
 
-  // ❗ empty check
   if (!username) {
-    return res.json({
-      success: false,
-      message: "Enter username"
-    });
+    return res.json({ success: false, message: "Enter username" });
   }
-let { username } = req.body;
-username = xss(username);
+
   const user = await User.findOne({ username });
 
   if (!user) {
@@ -220,22 +171,18 @@ username = xss(username);
   res.json({ success: true, message: "Reset token generated" });
 });
 
-/* 🔥 FIXED RESET PASSWORD */
+/* RESET PASSWORD */
 app.post("/api/reset-password", csrfProtection, async (req, res) => {
+
   let { token, newPassword } = req.body;
 
-token = xss(token);
-newPassword = xss(newPassword);
-
-  console.log("Reset request:", token);
+  token = xss(token);
+  newPassword = xss(newPassword);
 
   const user = await User.findOne({ resetToken: token });
 
   if (!user) {
-    return res.json({
-      success: false,
-      message: "Invalid token"
-    });
+    return res.json({ success: false, message: "Invalid token" });
   }
 
   if (!newPassword || newPassword.length < 8) {
@@ -252,10 +199,7 @@ newPassword = xss(newPassword);
 
   await user.save();
 
-  res.json({
-    success: true,
-    message: "Password reset successful"
-  });
+  res.json({ success: true, message: "Password reset successful" });
 });
 
 /* STATIC */
