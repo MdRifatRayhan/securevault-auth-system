@@ -79,7 +79,6 @@ button {
   margin-bottom:10px;
 }
 
-/* hidden helper */
 .hidden {
   display:none;
 }
@@ -120,7 +119,11 @@ button {
 <div id="otpBox" class="hidden">
 <h2>🔢 Enter OTP</h2>
 <input id="otp" placeholder="Enter OTP">
+
+<p id="timer"></p>
+
 <button onclick="verifyOtp()">Verify OTP</button>
+<button class="secondary" onclick="resendOtp()">Resend OTP</button>
 </div>
 
 <!-- DASHBOARD -->
@@ -144,23 +147,46 @@ button {
 
 <script>
 
+/* ================= CSRF ================= */
 async function getCSRF() {
   const res = await fetch("/api/csrf-token");
   const data = await res.json();
   return data.csrfToken;
 }
 
-/* PASSWORD TOGGLE */
+/* ================= TIMER ================= */
+let timeLeft = 45;
+let timerInterval;
+
+function startTimer() {
+  timeLeft = 45;
+
+  clearInterval(timerInterval);
+
+  timerInterval = setInterval(() => {
+    document.getElementById("timer").innerText =
+      "⏳ Time left: " + timeLeft + "s";
+
+    timeLeft--;
+
+    if (timeLeft < 0) {
+      clearInterval(timerInterval);
+      document.getElementById("timer").innerText = "❌ OTP expired";
+    }
+  }, 1000);
+}
+
+/* ================= PASSWORD TOGGLE ================= */
 function togglePass() {
   pass.type = pass.type === "password" ? "text" : "password";
 }
 
-/* DARK MODE */
+/* ================= DARK MODE ================= */
 function toggleMode() {
   document.body.classList.toggle("dark");
 }
 
-/* NAVIGATION */
+/* ================= NAVIGATION ================= */
 function showRegister() {
   loginBox.classList.add("hidden");
   registerBox.classList.remove("hidden");
@@ -169,10 +195,11 @@ function showRegister() {
 function showLogin() {
   registerBox.classList.add("hidden");
   resetBox.classList.add("hidden");
+  otpBox.classList.add("hidden");
   loginBox.classList.remove("hidden");
 }
 
-/* REGISTER */
+/* ================= REGISTER ================= */
 async function register() {
 
   if (regPass.value.length < 8) {
@@ -198,15 +225,12 @@ async function register() {
   const data = await res.json();
   msg.innerText = data.message;
 
-  // auto go back to login
-  if (data.message.toLowerCase().includes("success")) {
-    setTimeout(() => {
-      showLogin();
-    }, 1000);
+  if (data.success) {
+    setTimeout(showLogin, 1000);
   }
 }
 
-/* LOGIN */
+/* ================= LOGIN ================= */
 async function login() {
   const token = await getCSRF();
 
@@ -229,10 +253,12 @@ async function login() {
   if (data.success) {
     loginBox.classList.add("hidden");
     otpBox.classList.remove("hidden");
+
+    startTimer(); // 🔥 TIMER START
   }
 }
 
-/* OTP */
+/* ================= VERIFY OTP ================= */
 async function verifyOtp() {
   const token = await getCSRF();
 
@@ -252,12 +278,35 @@ async function verifyOtp() {
   msg.innerText = data.message;
 
   if (data.success) {
+    clearInterval(timerInterval);
+
     otpBox.classList.add("hidden");
     dashboard.classList.remove("hidden");
   }
 }
 
-/* FORGOT */
+/* ================= RESEND OTP ================= */
+async function resendOtp() {
+  const token = await getCSRF();
+
+  const res = await fetch("/api/resend-otp", {
+    method:"POST",
+    credentials:"include",
+    headers:{
+      "Content-Type":"application/json",
+      "CSRF-Token":token
+    }
+  });
+
+  const data = await res.json();
+  msg.innerText = data.message;
+
+  if (data.success) {
+    startTimer(); // 🔥 RESET TIMER
+  }
+}
+
+/* ================= FORGOT ================= */
 async function forgot() {
   const token = await getCSRF();
 
@@ -284,7 +333,7 @@ async function forgot() {
   resetBox.classList.remove("hidden");
 }
 
-/* RESET */
+/* ================= RESET ================= */
 async function resetPassword() {
   const token = await getCSRF();
 
@@ -309,7 +358,7 @@ async function resetPassword() {
   }
 }
 
-/* LOGOUT */
+/* ================= LOGOUT ================= */
 function logout() {
   localStorage.removeItem("token");
   location.reload();

@@ -1,5 +1,4 @@
 const express = require("express");
-const path = require("path");
 const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
@@ -33,6 +32,7 @@ const User = mongoose.model("User", {
 /* TEMP */
 let currentOTP = "";
 let otpTime = 0;
+let lastUser = ""; // 🔥 track current user
 
 /* CSRF */
 app.get("/api/csrf-token", csrfProtection, (req, res) => {
@@ -41,7 +41,6 @@ app.get("/api/csrf-token", csrfProtection, (req, res) => {
 
 /* REGISTER */
 app.post("/api/register", csrfProtection, async (req, res) => {
-
   let { username, email, password } = req.body;
 
   username = xss(username);
@@ -63,7 +62,6 @@ app.post("/api/register", csrfProtection, async (req, res) => {
   }
 
   const hash = await bcrypt.hash(password, 10);
-
   await User.create({ username, email, password: hash });
 
   res.json({ success: true, message: "Registered" });
@@ -71,7 +69,6 @@ app.post("/api/register", csrfProtection, async (req, res) => {
 
 /* LOGIN */
 app.post("/api/login", csrfProtection, async (req, res) => {
-
   let { username, password } = req.body;
 
   username = xss(username);
@@ -98,15 +95,26 @@ app.post("/api/login", csrfProtection, async (req, res) => {
 
   if (!ok) {
     user.loginAttempts += 1;
+    let attemptsLeft = 3 - user.loginAttempts;
 
     if (user.loginAttempts >= 3) {
       user.lockUntil = Date.now() + 5 * 60 * 1000;
       user.loginAttempts = 0;
+
+      await user.save();
+
+      return res.json({
+        success: false,
+        message: "Account locked for 5 minutes"
+      });
     }
 
     await user.save();
 
-    return res.json({ success: false, message: "Wrong password" });
+    return res.json({
+      success: false,
+      message: attemptsLeft + " attempts left"
+    });
   }
 
   user.loginAttempts = 0;
@@ -115,23 +123,42 @@ app.post("/api/login", csrfProtection, async (req, res) => {
 
   currentOTP = Math.floor(100000 + Math.random() * 900000).toString();
   otpTime = Date.now();
+  lastUser = username;
 
   console.log("OTP:", currentOTP);
 
   res.json({ success: true, message: "OTP sent" });
 });
 
+/* 🔥 RESEND OTP */
+app.post("/api/resend-otp", csrfProtection, (req, res) => {
+
+  if (!lastUser) {
+    return res.json({ success: false, message: "Login first" });
+  }
+
+  currentOTP = Math.floor(100000 + Math.random() * 900000).toString();
+  otpTime = Date.now();
+
+  console.log("Resent OTP:", currentOTP);
+
+  res.json({ success: true, message: "OTP resent" });
+});
+
 /* VERIFY OTP */
 app.post("/api/verify-otp", csrfProtection, (req, res) => {
   const { otp } = req.body;
 
-  console.log("Entered OTP:", otp);
-
-  if (Date.now() - otpTime > 2 * 60 * 1000) {
+  if (!otpTime || Date.now() - otpTime > 45000) {
     return res.json({ success: false, message: "OTP expired" });
   }
 
   if (otp === currentOTP) {
+
+    currentOTP = "";
+    otpTime = 0;
+    lastUser = "";
+
     const token = jwt.sign({ user: "demo" }, SECRET);
 
     return res.json({
@@ -146,7 +173,6 @@ app.post("/api/verify-otp", csrfProtection, (req, res) => {
 
 /* FORGOT PASSWORD */
 app.post("/api/forgot-password", csrfProtection, async (req, res) => {
-
   let { username } = req.body;
 
   username = xss(username);
@@ -173,7 +199,6 @@ app.post("/api/forgot-password", csrfProtection, async (req, res) => {
 
 /* RESET PASSWORD */
 app.post("/api/reset-password", csrfProtection, async (req, res) => {
-
   let { token, newPassword } = req.body;
 
   token = xss(token);
@@ -202,7 +227,6 @@ app.post("/api/reset-password", csrfProtection, async (req, res) => {
   res.json({ success: true, message: "Password reset successful" });
 });
 
-/* STATIC */
 app.use(express.static(__dirname));
 
 app.listen(3000, () => {
