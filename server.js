@@ -133,7 +133,17 @@ app.post("/api/login", csrfProtection, async (req, res) => {
   otpTime = Date.now();
   lastUser = username;
 
-  console.log("OTP:", currentOTP);
+  await transporter.sendMail({
+  from: "SecureVault <rifatrayhan430@gmail.com>",
+  to: user.email,
+  subject: "Your SecureVault OTP Code",
+  html: `
+    <h2>SecureVault Login OTP</h2>
+    <p>Your OTP code is:</p>
+    <h1>${currentOTP}</h1>
+    <p>This OTP will expire in 45 seconds.</p>
+  `
+});
 
   res.json({ success: true, message: "OTP sent" });
 });
