@@ -5,7 +5,6 @@ const jwt = require("jsonwebtoken");
 const csurf = require("csurf");
 const cookieParser = require("cookie-parser");
 const xss = require("xss");
-const nodemailer = require("nodemailer");
 
 const app = express();
 
@@ -14,13 +13,6 @@ app.use(cookieParser());
 
 const csrfProtection = csurf({ cookie: true });
 const SECRET = "mysecretkey";
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: "rifatrayhan430@gmail.com",
-    pass: "bzfv zidk mvep hnaj"
-  }
-});
 
 /* DB */
 mongoose.connect("mongodb+srv://admin:fI27hhJbWUQhh9XQ@cluster0.cw6dvem.mongodb.net/securevault?retryWrites=true&w=majority")
@@ -133,17 +125,7 @@ app.post("/api/login", csrfProtection, async (req, res) => {
   otpTime = Date.now();
   lastUser = username;
 
-  await transporter.sendMail({
-  from: "SecureVault <rifatrayhan430@gmail.com>",
-  to: user.email,
-  subject: "Your SecureVault OTP Code",
-  html: `
-    <h2>SecureVault Login OTP</h2>
-    <p>Your OTP code is:</p>
-    <h1>${currentOTP}</h1>
-    <p>This OTP will expire in 45 seconds.</p>
-  `
-});
+  console.log("OTP:", currentOTP);
 
   res.json({ success: true, message: "OTP sent" });
 });

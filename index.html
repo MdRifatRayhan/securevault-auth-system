@@ -110,7 +110,6 @@ button {
 <div id="registerBox" class="hidden">
 <h2>🆕 Create Account</h2>
 <input id="regUser" placeholder="Username">
-<input id="regEmail" placeholder="Email">
 <input id="regPass" type="password" placeholder="Password (min 8 chars)">
 <button onclick="register()">Register</button>
 <button class="secondary" onclick="showLogin()">Back to Login</button>
@@ -217,11 +216,10 @@ async function register() {
       "Content-Type":"application/json",
       "CSRF-Token":token
     },
-   body:JSON.stringify({
-  username:regUser.value,
-  email:regEmail.value,
-  password:regPass.value
-})
+    body:JSON.stringify({
+      username:regUser.value,
+      password:regPass.value
+    })
   });
 
   const data = await res.json();
