@@ -27,9 +27,12 @@ function auth(req, res, next) {
 
   try {
 
-    jwt.verify(token, SECRET);
+    const decoded =
+jwt.verify(token, SECRET);
 
-    next();
+req.user = decoded.user;
+
+next();
 
   } catch {
 
@@ -192,7 +195,10 @@ app.post("/api/verify-otp", csrfProtection, (req, res) => {
     otpTime = 0;
     lastUser = "";
 
-    const token = jwt.sign({ user: "demo" }, SECRET);
+    const token = jwt.sign(
+  { user: lastUser },
+  SECRET
+);
 
     return res.json({
       success: true,
@@ -263,9 +269,10 @@ app.post("/api/reset-password", csrfProtection, async (req, res) => {
 app.get("/api/profile", auth, (req, res) => {
 
   res.json({
-    success: true,
-    message: "Protected data accessed"
-  });
+  success: true,
+  username: req.user,
+  message: "Protected data accessed"
+});
 
 });
 

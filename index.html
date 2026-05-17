@@ -141,7 +141,9 @@ button {
 <!-- DASHBOARD -->
 <div id="dashboard" class="hidden">
 <h2>✅ Welcome</h2>
-<p>Secure Login Successful</p>
+<p id="welcomeText">
+Secure Login Successful
+</p>
 <button onclick="getProfile()">
 Check Protected Route
 </button>
@@ -306,6 +308,12 @@ async function verifyOtp() {
   });
 
   const data = await res.json();
+  if (data.success) {
+
+  welcomeText.innerText =
+  "Welcome, " + data.username;
+
+}
   showMsg(data.message, data.success ? "success" : "error");
 
   if (data.success) {
