@@ -67,10 +67,22 @@ button {
   border:1px solid white;
 }
 
-#msg {
+#msg #msg {
   text-align:center;
   margin-top:10px;
   font-size:14px;
+  padding:10px;
+  border-radius:8px;
+}
+
+.success {
+  background:#2ecc71;
+  color:white;
+}
+
+.error {
+  background:#e74c3c;
+  color:white;
 }
 
 .toggle {
@@ -146,6 +158,14 @@ button {
 </div>
 
 <script>
+
+  function showMsg(message, type="success") {
+  msg.innerText = message;
+
+  msg.className = "";
+
+  msg.classList.add(type);
+}
 
 /* ================= CSRF ================= */
 async function getCSRF() {
@@ -223,7 +243,7 @@ async function register() {
   });
 
   const data = await res.json();
-  msg.innerText = data.message;
+  showMsg(data.message, data.success ? "success" : "error");
 
   if (data.success) {
     setTimeout(showLogin, 1000);
@@ -248,7 +268,7 @@ async function login() {
   });
 
   const data = await res.json();
-  msg.innerText = data.message;
+  showMsg(data.message, data.success ? "success" : "error");
 
   if (data.success) {
     loginBox.classList.add("hidden");
@@ -275,7 +295,7 @@ async function verifyOtp() {
   });
 
   const data = await res.json();
-  msg.innerText = data.message;
+  showMsg(data.message, data.success ? "success" : "error");
 
   if (data.success) {
     clearInterval(timerInterval);
@@ -299,7 +319,7 @@ async function resendOtp() {
   });
 
   const data = await res.json();
-  msg.innerText = data.message;
+ showMsg(data.message, data.success ? "success" : "error");
 
   if (data.success) {
     startTimer(); // 🔥 RESET TIMER
@@ -328,7 +348,7 @@ async function forgot() {
   });
 
   const data = await res.json();
-  msg.innerText = data.message;
+  showMsg(data.message, data.success ? "success" : "error");
 
   resetBox.classList.remove("hidden");
 }
@@ -351,7 +371,7 @@ async function resetPassword() {
   });
 
   const data = await res.json();
-  msg.innerText = data.message;
+  showMsg(data.message, data.success ? "success" : "error");
 
   if (data.success) {
     showLogin();
