@@ -122,7 +122,7 @@ button {
 <div id="registerBox" class="hidden">
 <h2>🆕 Create Account</h2>
 <input id="regUser" placeholder="Username">
-<input id="regPass" type="password" placeholder="Password (min 8 chars)">
+<input id="regPass" type="password" placeholder="Password (8 chars, uppercase, number, special)">
 <button onclick="register()">Register</button>
 <button class="secondary" onclick="showLogin()">Back to Login</button>
 </div>
@@ -222,10 +222,18 @@ function showLogin() {
 /* ================= REGISTER ================= */
 async function register() {
 
-  if (regPass.value.length < 8) {
-    msg.innerText = "Password must be at least 8 characters";
-    return;
-  }
+ const strongPassword =
+/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#]).{8,}$/;
+
+if (!strongPassword.test(regPass.value)) {
+
+  showMsg(
+    "Password must contain 8 characters, 1 uppercase letter, 1 number and 1 special character",
+    "error"
+  );
+
+  return;
+}
 
   const token = await getCSRF();
 

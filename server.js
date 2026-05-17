@@ -57,9 +57,16 @@ app.post("/api/register", csrfProtection, async (req, res) => {
     return res.json({ success: false, message: "Username already exists" });
   }
 
-  if (password.length < 8) {
-    return res.json({ success: false, message: "Password must be at least 8 characters" });
-  }
+  const strongPassword =
+/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#]).{8,}$/;
+
+if (!strongPassword.test(password)) {
+  return res.json({
+    success: false,
+    message:
+    "Password must contain 8 characters, 1 uppercase letter, 1 number and 1 special character"
+  });
+}
 
   const hash = await bcrypt.hash(password, 10);
   await User.create({ username, email, password: hash });
