@@ -14,6 +14,32 @@ app.use(cookieParser());
 const csrfProtection = csurf({ cookie: true });
 const SECRET = "mysecretkey";
 
+function auth(req, res, next) {
+
+  const token = req.headers.authorization;
+
+  if (!token) {
+    return res.json({
+      success: false,
+      message: "Access denied"
+    });
+  }
+
+  try {
+
+    jwt.verify(token, SECRET);
+
+    next();
+
+  } catch {
+
+    res.json({
+      success: false,
+      message: "Invalid token"
+    });
+  }
+}
+
 /* DB */
 mongoose.connect("mongodb+srv://admin:fI27hhJbWUQhh9XQ@cluster0.cw6dvem.mongodb.net/securevault?retryWrites=true&w=majority")
 .then(()=>console.log("MongoDB Connected"))
@@ -232,6 +258,15 @@ app.post("/api/reset-password", csrfProtection, async (req, res) => {
   await user.save();
 
   res.json({ success: true, message: "Password reset successful" });
+});
+
+app.get("/api/profile", auth, (req, res) => {
+
+  res.json({
+    success: true,
+    message: "Protected data accessed"
+  });
+
 });
 
 app.use(express.static(__dirname));

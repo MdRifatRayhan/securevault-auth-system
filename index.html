@@ -142,6 +142,9 @@ button {
 <div id="dashboard" class="hidden">
 <h2>✅ Welcome</h2>
 <p>Secure Login Successful</p>
+<button onclick="getProfile()">
+Check Protected Route
+</button>
 <button onclick="logout()">Logout</button>
 </div>
 
@@ -306,6 +309,7 @@ async function verifyOtp() {
   showMsg(data.message, data.success ? "success" : "error");
 
   if (data.success) {
+    localStorage.setItem("token", data.token);
     clearInterval(timerInterval);
 
     otpBox.classList.add("hidden");
@@ -384,6 +388,27 @@ async function resetPassword() {
   if (data.success) {
     showLogin();
   }
+}
+
+async function getProfile() {
+
+  const token =
+  localStorage.getItem("token");
+
+  const res = await fetch("/api/profile", {
+
+    headers: {
+      Authorization: token
+    }
+
+  });
+
+  const data = await res.json();
+
+  showMsg(
+    data.message,
+    data.success ? "success" : "error"
+  );
 }
 
 /* ================= LOGOUT ================= */
