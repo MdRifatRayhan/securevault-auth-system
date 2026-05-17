@@ -256,6 +256,7 @@ if (!strongPassword.test(regPass.value)) {
   });
 
   const data = await res.json();
+  console.log(data);
   showMsg(data.message, data.success ? "success" : "error");
 
   if (data.success) {

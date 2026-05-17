@@ -199,6 +199,7 @@ app.post("/api/verify-otp", csrfProtection, (req, res) => {
   { user: lastUser },
   SECRET
 );
+console.log(lastUser);
 
     return res.json({
       success: true,
