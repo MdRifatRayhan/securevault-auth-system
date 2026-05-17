@@ -29,6 +29,7 @@ function auth(req, res, next) {
 
     const decoded =
 jwt.verify(token, SECRET);
+console.log(decoded);
 
 req.user = decoded.user;
 
@@ -199,7 +200,7 @@ app.post("/api/verify-otp", csrfProtection, (req, res) => {
   { user: lastUser },
   SECRET
 );
-console.log(lastUser);
+console.log("TOKEN USER:", lastUser);
 
     return res.json({
       success: true,
