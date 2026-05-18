@@ -62,6 +62,7 @@ const User = mongoose.model("User", {
 let currentOTP = "";
 let otpTime = 0;
 let otpUser = "";// 🔥 track current user
+let otpAttempts = 0;
 
 /* CSRF */
 app.get("/api/csrf-token", csrfProtection, (req, res) => {
@@ -157,9 +158,14 @@ app.post("/api/login", csrfProtection, async (req, res) => {
   user.lockUntil = 0;
   await user.save();
 
-  currentOTP = Math.floor(100000 + Math.random() * 900000).toString();
-  otpTime = Date.now();
-  otpUser = username;
+  currentOTP =
+Math.floor(100000 + Math.random() * 900000).toString();
+
+otpTime = Date.now();
+
+otpUser = username;
+
+otpAttempts = 0;
 
   console.log("OTP:", currentOTP);
 
@@ -176,8 +182,12 @@ app.post("/api/resend-otp", csrfProtection, (req, res) => {
   });
 }
 
-  currentOTP = Math.floor(100000 + Math.random() * 900000).toString();
-  otpTime = Date.now();
+  currentOTP =
+Math.floor(100000 + Math.random() * 900000).toString();
+
+otpTime = Date.now();
+
+otpAttempts = 0;
 
   console.log("Resent OTP:", currentOTP);
 
@@ -192,6 +202,32 @@ app.post("/api/verify-otp", csrfProtection, (req, res) => {
     return res.json({ success: false, message: "OTP expired" });
   }
 
+  if (otp !== currentOTP) {
+
+  otpAttempts++;
+
+  if (otpAttempts >= 3) {
+
+    currentOTP = "";
+    otpTime = 0;
+    otpUser = "";
+    otpAttempts = 0;
+
+    return res.json({
+      success: false,
+      message:
+      "Too many wrong OTP attempts. Login again."
+    });
+  }
+
+  return res.json({
+    success: false,
+    message:
+    "Wrong OTP. Attempts left: " +
+    (3 - otpAttempts)
+  });
+}
+
   if (otp === currentOTP) {
 
     const token = jwt.sign(
@@ -202,6 +238,7 @@ app.post("/api/verify-otp", csrfProtection, (req, res) => {
 currentOTP = "";
 otpTime = 0;
 otpUser = "";
+otpAttempts = 0;
 
     return res.json({
       success: true,
@@ -210,7 +247,7 @@ otpUser = "";
     });
   }
 
-  res.json({ success: false, message: "Wrong OTP" });
+
 });
 
 /* FORGOT PASSWORD */
