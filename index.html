@@ -486,9 +486,27 @@ async function getProfile() {
 
   const data = await res.json();
 
+  if (!data.success) {
+
+    localStorage.removeItem("token");
+
+    showMsg(
+      "Session expired. Login again.",
+      "error"
+    );
+
+    setTimeout(() => {
+
+      location.reload();
+
+    }, 1000);
+
+    return;
+  }
+
   showMsg(
     data.message,
-    data.success ? "success" : "error"
+    "success"
   );
 }
 
