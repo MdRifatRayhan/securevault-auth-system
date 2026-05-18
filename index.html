@@ -230,7 +230,7 @@ function startResendCooldown() {
     "Resend in " +
     resendCooldown + "s";
 
-    if (resendCooldown <= 0) {
+    if (resendCooldown < 0) {
 
       clearInterval(resendInterval);
 
@@ -366,26 +366,37 @@ async function verifyOtp() {
 
 /* ================= RESEND OTP ================= */
 async function resendOtp() {
+
+  if (resendBtn.disabled) return;
+
   const token = await getCSRF();
 
   const res = await fetch("/api/resend-otp", {
+
     method:"POST",
+
     credentials:"include",
+
     headers:{
       "Content-Type":"application/json",
       "CSRF-Token":token
     }
+
   });
 
   const data = await res.json();
- showMsg(data.message, data.success ? "success" : "error");
 
-  if(data.success){
+  showMsg(
+    data.message,
+    data.success ? "success" : "error"
+  );
 
-  startTimer();
+  if (data.success) {
 
-  startResendCooldown();
-}
+    startTimer();
+
+    startResendCooldown();
+  }
 }
 
 /* ================= FORGOT ================= */
