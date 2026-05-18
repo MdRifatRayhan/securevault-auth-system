@@ -1,3 +1,6 @@
+```js
+// ====================== server.js ======================
+
 const express = require("express");
 const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
@@ -12,7 +15,10 @@ app.use(express.json());
 app.use(cookieParser());
 
 const csrfProtection = csurf({ cookie: true });
+
 const SECRET = "mysecretkey";
+
+/* ================= AUTH MIDDLEWARE ================= */
 
 function auth(req, res, next) {
 
@@ -28,12 +34,11 @@ function auth(req, res, next) {
   try {
 
     const decoded =
-jwt.verify(token, SECRET);
-console.log(decoded);
+    jwt.verify(token, SECRET);
 
-req.user = decoded.user;
+    req.user = decoded.user;
 
-next();
+    next();
 
   } catch {
 
@@ -44,242 +49,495 @@ next();
   }
 }
 
-/* DB */
-mongoose.connect("mongodb+srv://admin:fI27hhJbWUQhh9XQ@cluster0.cw6dvem.mongodb.net/securevault?retryWrites=true&w=majority")
-.then(()=>console.log("MongoDB Connected"))
-.catch(err=>console.log(err));
+/* ================= DATABASE ================= */
 
-/* MODEL */
+mongoose.connect(
+"mongodb+srv://admin:fI27hhJbWUQhh9XQ@cluster0.cw6dvem.mongodb.net/securevault?retryWrites=true&w=majority"
+)
+
+.then(() => console.log("MongoDB Connected"))
+
+.catch(err => console.log(err));
+
+/* ================= MODEL ================= */
+
 const User = mongoose.model("User", {
+
   username: String,
+
   email: String,
+
   password: String,
+
   resetToken: String,
-  loginAttempts: { type: Number, default: 0 },
-  lockUntil: { type: Number, default: 0 }
+
+  loginAttempts: {
+    type: Number,
+    default: 0
+  },
+
+  lockUntil: {
+    type: Number,
+    default: 0
+  }
 });
 
-/* TEMP */
+/* ================= TEMP OTP ================= */
+
 let currentOTP = "";
-let otpTime = 0;
-// 🔥 track current user
 
-/* CSRF */
-app.get("/api/csrf-token", csrfProtection, (req, res) => {
-  res.json({ csrfToken: req.csrfToken() });
+let otpTime = 0;
+
+/* ================= CSRF ================= */
+
+app.get("/api/csrf-token",
+
+csrfProtection,
+
+(req, res) => {
+
+  res.json({
+    csrfToken: req.csrfToken()
+  });
+
 });
 
-/* REGISTER */
-app.post("/api/register", csrfProtection, async (req, res) => {
-  let { username, email, password } = req.body;
+/* ================= REGISTER ================= */
+
+app.post("/api/register",
+
+csrfProtection,
+
+async (req, res) => {
+
+  let { username, email, password } =
+  req.body;
 
   username = xss(username);
   email = xss(email);
   password = xss(password);
 
   if (!username || !password) {
-    return res.json({ success: false, message: "All fields required" });
+
+    return res.json({
+      success: false,
+      message: "All fields required"
+    });
   }
 
-  const existing = await User.findOne({ username });
+  const existing =
+  await User.findOne({ username });
 
   if (existing) {
-    return res.json({ success: false, message: "Username already exists" });
+
+    return res.json({
+      success: false,
+      message: "Username already exists"
+    });
   }
 
   const strongPassword =
-/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#]).{8,}$/;
+  /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#]).{8,}$/;
 
-if (!strongPassword.test(password)) {
-  return res.json({
-    success: false,
-    message:
-    "Password must contain 8 characters, 1 uppercase letter, 1 number and 1 special character"
+  if (!strongPassword.test(password)) {
+
+    return res.json({
+
+      success: false,
+
+      message:
+      "Password must contain 8 characters, 1 uppercase letter, 1 number and 1 special character"
+
+    });
+  }
+
+  const hash =
+  await bcrypt.hash(password, 10);
+
+  await User.create({
+
+    username,
+    email,
+    password: hash
+
   });
-}
 
-  const hash = await bcrypt.hash(password, 10);
-  await User.create({ username, email, password: hash });
+  res.json({
+    success: true,
+    message: "Registered"
+  });
 
-  res.json({ success: true, message: "Registered" });
 });
 
-/* LOGIN */
-app.post("/api/login", csrfProtection, async (req, res) => {
-  let { username, password } = req.body;
+/* ================= LOGIN ================= */
+
+app.post("/api/login",
+
+csrfProtection,
+
+async (req, res) => {
+
+  let { username, password } =
+  req.body;
 
   username = xss(username);
   password = xss(password);
 
   if (!username || !password) {
-    return res.json({ success: false, message: "All fields required" });
-  }
 
-  const user = await User.findOne({ username });
-
-  if (!user) {
-    return res.json({ success: false, message: "User not found" });
-  }
-
-  if (user.lockUntil && user.lockUntil > Date.now()) {
     return res.json({
       success: false,
-      message: "Account locked. Try again later"
+      message: "All fields required"
     });
   }
 
-  const ok = await bcrypt.compare(password, user.password);
+  const user =
+  await User.findOne({ username });
+
+  if (!user) {
+
+    return res.json({
+      success: false,
+      message: "User not found"
+    });
+  }
+
+  if (
+    user.lockUntil &&
+    user.lockUntil > Date.now()
+  ) {
+
+    return res.json({
+
+      success: false,
+
+      message:
+      "Account locked. Try again later"
+
+    });
+  }
+
+  const ok =
+  await bcrypt.compare(
+    password,
+    user.password
+  );
 
   if (!ok) {
+
     user.loginAttempts += 1;
-    let attemptsLeft = 3 - user.loginAttempts;
+
+    let attemptsLeft =
+    3 - user.loginAttempts;
 
     if (user.loginAttempts >= 3) {
-      user.lockUntil = Date.now() + 5 * 60 * 1000;
+
+      user.lockUntil =
+      Date.now() + 5 * 60 * 1000;
+
       user.loginAttempts = 0;
 
       await user.save();
 
       return res.json({
+
         success: false,
-        message: "Account locked for 5 minutes"
+
+        message:
+        "Account locked for 5 minutes"
+
       });
     }
 
     await user.save();
 
     return res.json({
+
       success: false,
-      message: attemptsLeft + " attempts left"
+
+      message:
+      attemptsLeft + " attempts left"
+
     });
   }
 
   user.loginAttempts = 0;
+
   user.lockUntil = 0;
+
   await user.save();
 
-  currentOTP = Math.floor(100000 + Math.random() * 900000).toString();
-  otpTime = Date.now();
+  currentOTP =
+  Math.floor(
+    100000 +
+    Math.random() * 900000
+  ).toString();
 
+  otpTime = Date.now();
 
   console.log("OTP:", currentOTP);
 
-  res.json({ success: true, message: "OTP sent" });
+  res.json({
+    success: true,
+    message: "OTP sent"
+  });
+
 });
 
-/* 🔥 RESEND OTP */
-app.post("/api/resend-otp", csrfProtection, (req, res) => {
+/* ================= RESEND OTP ================= */
 
-  if (!lastUser) {
-    return res.json({ success: false, message: "Login first" });
-  }
+app.post("/api/resend-otp",
 
-  currentOTP = Math.floor(100000 + Math.random() * 900000).toString();
+csrfProtection,
+
+(req, res) => {
+
+  currentOTP =
+  Math.floor(
+    100000 +
+    Math.random() * 900000
+  ).toString();
+
   otpTime = Date.now();
 
   console.log("Resent OTP:", currentOTP);
 
-  res.json({ success: true, message: "OTP resent" });
+  res.json({
+    success: true,
+    message: "OTP resent"
+  });
+
 });
 
-/* VERIFY OTP */
-app.post("/api/verify-otp", csrfProtection, (req, res) => {
-  const { otp } = req.body;
+/* ================= VERIFY OTP ================= */
 
-  if (!otpTime || Date.now() - otpTime > 45000) {
-    return res.json({ success: false, message: "OTP expired" });
+app.post("/api/verify-otp",
+
+csrfProtection,
+
+(req, res) => {
+
+  const { otp, username } =
+  req.body;
+
+  if (
+    !otpTime ||
+    Date.now() - otpTime > 45000
+  ) {
+
+    return res.json({
+
+      success: false,
+
+      message:
+      "OTP expired"
+
+    });
   }
 
   if (otp === currentOTP) {
 
     currentOTP = "";
     otpTime = 0;
-    lastUser = "";
 
-  const token = jwt.sign(
-  { user: "Authenticated User" },
-  SECRET
-);
-console.log("TOKEN USER:", lastUser);
+    const token =
+    jwt.sign(
+      { user: username },
+      SECRET
+    );
 
     return res.json({
+
       success: true,
-      message: "Login successful",
+
+      message:
+      "Login successful",
+
       token: token
+
     });
   }
 
-  res.json({ success: false, message: "Wrong OTP" });
+  res.json({
+
+    success: false,
+
+    message:
+    "Wrong OTP"
+
+  });
+
 });
 
-/* FORGOT PASSWORD */
-app.post("/api/forgot-password", csrfProtection, async (req, res) => {
-  let { username } = req.body;
+/* ================= FORGOT PASSWORD ================= */
+
+app.post("/api/forgot-password",
+
+csrfProtection,
+
+async (req, res) => {
+
+  let { username } =
+  req.body;
 
   username = xss(username);
 
   if (!username) {
-    return res.json({ success: false, message: "Enter username" });
-  }
 
-  const user = await User.findOne({ username });
-
-  if (!user) {
-    return res.json({ success: false, message: "User not found" });
-  }
-
-  const token = Math.random().toString(36).substring(2);
-
-  user.resetToken = token;
-  await user.save();
-
-  console.log("Reset Token:", token);
-
-  res.json({ success: true, message: "Reset token generated" });
-});
-
-/* RESET PASSWORD */
-app.post("/api/reset-password", csrfProtection, async (req, res) => {
-  let { token, newPassword } = req.body;
-
-  token = xss(token);
-  newPassword = xss(newPassword);
-
-  const user = await User.findOne({ resetToken: token });
-
-  if (!user) {
-    return res.json({ success: false, message: "Invalid token" });
-  }
-
-  if (!newPassword || newPassword.length < 8) {
     return res.json({
+
       success: false,
-      message: "Password must be at least 8 characters"
+
+      message:
+      "Enter username"
+
     });
   }
 
-  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  const user =
+  await User.findOne({ username });
 
-  user.password = hashedPassword;
+  if (!user) {
+
+    return res.json({
+
+      success: false,
+
+      message:
+      "User not found"
+
+    });
+  }
+
+  const token =
+  Math.random()
+  .toString(36)
+  .substring(2);
+
+  user.resetToken = token;
+
+  await user.save();
+
+  console.log(
+    "Reset Token:",
+    token
+  );
+
+  res.json({
+
+    success: true,
+
+    message:
+    "Reset token generated"
+
+  });
+
+});
+
+/* ================= RESET PASSWORD ================= */
+
+app.post("/api/reset-password",
+
+csrfProtection,
+
+async (req, res) => {
+
+  let {
+    token,
+    newPassword
+  } = req.body;
+
+  token = xss(token);
+
+  newPassword =
+  xss(newPassword);
+
+  const user =
+  await User.findOne({
+    resetToken: token
+  });
+
+  if (!user) {
+
+    return res.json({
+
+      success: false,
+
+      message:
+      "Invalid token"
+
+    });
+  }
+
+  if (
+    !newPassword ||
+    newPassword.length < 8
+  ) {
+
+    return res.json({
+
+      success: false,
+
+      message:
+      "Password must be at least 8 characters"
+
+    });
+  }
+
+  const hashedPassword =
+  await bcrypt.hash(
+    newPassword,
+    10
+  );
+
+  user.password =
+  hashedPassword;
+
   user.resetToken = null;
 
   await user.save();
 
-  res.json({ success: true, message: "Password reset successful" });
+  res.json({
+
+    success: true,
+
+    message:
+    "Password reset successful"
+
+  });
+
 });
 
-app.get("/api/profile", auth, (req, res) => {
+/* ================= PROFILE ================= */
+
+app.get("/api/profile",
+
+auth,
+
+(req, res) => {
 
   res.json({
-  success: true,
-  username: req.user,
-  message: "Protected data accessed"
-});
+
+    success: true,
+
+    message:
+    "Welcome, " + req.user
+
+  });
 
 });
+
+/* ================= STATIC ================= */
 
 app.use(express.static(__dirname));
 
+/* ================= SERVER ================= */
+
 app.listen(3000, () => {
-  console.log("Server running on http://localhost:3000");
+
+  console.log(
+    "Server running on http://localhost:3000"
+  );
+
 });
+```

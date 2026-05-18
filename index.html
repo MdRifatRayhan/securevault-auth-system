@@ -1,100 +1,158 @@
+```html
+<!-- ====================== index.html ====================== -->
+
 <!DOCTYPE html>
 <html>
+
 <head>
+
 <title>SecureVault Pro</title>
 
 <style>
-* {
+
+*{
   margin:0;
   padding:0;
   box-sizing:border-box;
 }
 
-body {
-  font-family: Arial;
+body{
+  font-family:Arial;
   height:100vh;
   display:flex;
   justify-content:center;
   align-items:center;
-  background: linear-gradient(270deg,#667eea,#764ba2,#00c6ff);
-  background-size: 600% 600%;
-  animation: gradient 10s ease infinite;
+
+  background:
+  linear-gradient(
+    270deg,
+    #667eea,
+    #764ba2,
+    #00c6ff
+  );
+
+  background-size:600% 600%;
+
+  animation:
+  gradient 10s ease infinite;
 }
 
 @keyframes gradient {
-  0% {background-position:0% 50%;}
-  50% {background-position:100% 50%;}
-  100% {background-position:0% 50%;}
+
+  0%{
+    background-position:0% 50%;
+  }
+
+  50%{
+    background-position:100% 50%;
+  }
+
+  100%{
+    background-position:0% 50%;
+  }
 }
 
-.card {
+.card{
+
   width:380px;
+
   padding:30px;
+
   border-radius:20px;
-  background: rgba(255,255,255,0.1);
-  backdrop-filter: blur(20px);
-  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+
+  background:
+  rgba(255,255,255,0.1);
+
+  backdrop-filter:blur(20px);
+
+  box-shadow:
+  0 10px 40px rgba(0,0,0,0.3);
+
   color:white;
 }
 
-h2, h3 {
+h2,h3{
   text-align:center;
   margin-bottom:10px;
 }
 
-input {
+input{
+
   width:100%;
+
   padding:12px;
+
   margin:8px 0;
+
   border:none;
+
   border-radius:10px;
 }
 
-button {
+button{
+
   width:100%;
+
   padding:12px;
+
   margin-top:10px;
+
   border:none;
+
   border-radius:10px;
+
   background:#00c6ff;
+
   color:white;
+
   font-weight:bold;
+
   cursor:pointer;
 }
 
-.secondary {
+.secondary{
+
   background:transparent;
+
   border:1px solid white;
 }
 
-#msg #msg {
+#msg{
+
   text-align:center;
+
   margin-top:10px;
+
   font-size:14px;
+
   padding:10px;
+
   border-radius:8px;
 }
 
-.success {
+.success{
   background:#2ecc71;
-  color:white;
 }
 
-.error {
+.error{
   background:#e74c3c;
-  color:white;
 }
 
-.toggle {
+.toggle{
+
   display:flex;
+
   justify-content:flex-end;
+
   margin-bottom:10px;
 }
 
-.hidden {
+.hidden{
   display:none;
 }
+
 </style>
+
 </head>
 
 <body>
@@ -102,60 +160,162 @@ button {
 <div class="card">
 
 <div class="toggle">
+
 <label>🌙</label>
-<input type="checkbox" onclick="toggleMode()">
+
+<input
+type="checkbox"
+onclick="toggleMode()">
+
 </div>
 
 <!-- LOGIN -->
-<div id="loginBox">
-<h2>🔐 SecureVault</h2>
-<input id="user" placeholder="Username">
-<input id="pass" type="password" placeholder="Password">
-<button onclick="togglePass()">👁 Show/Hide Password</button>
-<button onclick="login()">Login</button>
 
-<button class="secondary" onclick="showRegister()">Create Account</button>
-<button class="secondary" onclick="forgot()">Forgot Password</button>
+<div id="loginBox">
+
+<h2>🔐 SecureVault</h2>
+
+<input
+id="user"
+placeholder="Username">
+
+<input
+id="pass"
+type="password"
+placeholder="Password">
+
+<button onclick="togglePass()">
+👁 Show/Hide Password
+</button>
+
+<button onclick="login()">
+Login
+</button>
+
+<button
+class="secondary"
+onclick="showRegister()">
+
+Create Account
+
+</button>
+
+<button
+class="secondary"
+onclick="forgot()">
+
+Forgot Password
+
+</button>
+
 </div>
 
 <!-- REGISTER -->
-<div id="registerBox" class="hidden">
+
+<div
+id="registerBox"
+class="hidden">
+
 <h2>🆕 Create Account</h2>
-<input id="regUser" placeholder="Username">
-<input id="regPass" type="password" placeholder="Password (8 chars, uppercase, number, special)">
-<button onclick="register()">Register</button>
-<button class="secondary" onclick="showLogin()">Back to Login</button>
+
+<input
+id="regUser"
+placeholder="Username">
+
+<input
+id="regPass"
+type="password"
+
+placeholder=
+"Password (8 chars, uppercase, number, special)">
+
+<button onclick="register()">
+Register
+</button>
+
+<button
+class="secondary"
+onclick="showLogin()">
+
+Back to Login
+
+</button>
+
 </div>
 
 <!-- OTP -->
-<div id="otpBox" class="hidden">
+
+<div
+id="otpBox"
+class="hidden">
+
 <h2>🔢 Enter OTP</h2>
-<input id="otp" placeholder="Enter OTP">
+
+<input
+id="otp"
+placeholder="Enter OTP">
 
 <p id="timer"></p>
 
-<button onclick="verifyOtp()">Verify OTP</button>
-<button class="secondary" onclick="resendOtp()">Resend OTP</button>
+<button onclick="verifyOtp()">
+Verify OTP
+</button>
+
+<button
+class="secondary"
+onclick="resendOtp()">
+
+Resend OTP
+
+</button>
+
 </div>
 
 <!-- DASHBOARD -->
-<div id="dashboard" class="hidden">
-<h2>✅ Welcome</h2>
-<p id="welcomeText">
+
+<div
+id="dashboard"
+class="hidden">
+
+<h2 id="welcomeText">
+✅ Welcome
+</h2>
+
+<p>
 Secure Login Successful
 </p>
+
 <button onclick="getProfile()">
 Check Protected Route
 </button>
-<button onclick="logout()">Logout</button>
+
+<button onclick="logout()">
+Logout
+</button>
+
 </div>
 
 <!-- RESET -->
-<div id="resetBox" class="hidden">
+
+<div
+id="resetBox"
+class="hidden">
+
 <h3>🔁 Reset Password</h3>
-<input id="resetToken" placeholder="Enter token">
-<input id="newPass" type="password" placeholder="New password">
-<button onclick="resetPassword()">Reset Password</button>
+
+<input
+id="resetToken"
+placeholder="Enter token">
+
+<input
+id="newPass"
+type="password"
+placeholder="New password">
+
+<button onclick="resetPassword()">
+Reset Password
+</button>
+
 </div>
 
 <p id="msg"></p>
@@ -164,7 +324,13 @@ Check Protected Route
 
 <script>
 
-  function showMsg(message, type="success") {
+/* ================= MESSAGE ================= */
+
+function showMsg(
+message,
+type="success"
+){
+
   msg.innerText = message;
 
   msg.className = "";
@@ -173,256 +339,476 @@ Check Protected Route
 }
 
 /* ================= CSRF ================= */
-async function getCSRF() {
-  const res = await fetch("/api/csrf-token");
-  const data = await res.json();
+
+async function getCSRF(){
+
+  const res =
+  await fetch("/api/csrf-token");
+
+  const data =
+  await res.json();
+
   return data.csrfToken;
 }
 
 /* ================= TIMER ================= */
+
 let timeLeft = 45;
+
 let timerInterval;
 
-function startTimer() {
+function startTimer(){
+
   timeLeft = 45;
 
   clearInterval(timerInterval);
 
-  timerInterval = setInterval(() => {
-    document.getElementById("timer").innerText =
-      "⏳ Time left: " + timeLeft + "s";
+  timerInterval =
+  setInterval(()=>{
+
+    timer.innerText =
+    "⏳ Time left: " +
+    timeLeft +
+    "s";
 
     timeLeft--;
 
-    if (timeLeft < 0) {
+    if(timeLeft < 0){
+
       clearInterval(timerInterval);
-      document.getElementById("timer").innerText = "❌ OTP expired";
+
+      timer.innerText =
+      "❌ OTP expired";
     }
-  }, 1000);
+
+  },1000);
 }
 
 /* ================= PASSWORD TOGGLE ================= */
-function togglePass() {
-  pass.type = pass.type === "password" ? "text" : "password";
+
+function togglePass(){
+
+  pass.type =
+  pass.type === "password"
+  ? "text"
+  : "password";
 }
 
 /* ================= DARK MODE ================= */
-function toggleMode() {
-  document.body.classList.toggle("dark");
+
+function toggleMode(){
+
+  document.body
+  .classList
+  .toggle("dark");
 }
 
 /* ================= NAVIGATION ================= */
-function showRegister() {
+
+function showRegister(){
+
   loginBox.classList.add("hidden");
-  registerBox.classList.remove("hidden");
+
+  registerBox
+  .classList
+  .remove("hidden");
 }
 
-function showLogin() {
-  registerBox.classList.add("hidden");
-  resetBox.classList.add("hidden");
-  otpBox.classList.add("hidden");
-  loginBox.classList.remove("hidden");
+function showLogin(){
+
+  registerBox
+  .classList
+  .add("hidden");
+
+  resetBox
+  .classList
+  .add("hidden");
+
+  otpBox
+  .classList
+  .add("hidden");
+
+  loginBox
+  .classList
+  .remove("hidden");
 }
 
 /* ================= REGISTER ================= */
-async function register() {
 
- const strongPassword =
-/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#]).{8,}$/;
+async function register(){
 
-if (!strongPassword.test(regPass.value)) {
+  const strongPassword =
+  /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#]).{8,}$/;
 
-  showMsg(
-    "Password must contain 8 characters, 1 uppercase letter, 1 number and 1 special character",
-    "error"
-  );
+  if(
+    !strongPassword
+    .test(regPass.value)
+  ){
 
-  return;
-}
+    showMsg(
 
-  const token = await getCSRF();
+      "Password must contain 8 characters, 1 uppercase letter, 1 number and 1 special character",
 
-  const res = await fetch("/api/register", {
+      "error"
+    );
+
+    return;
+  }
+
+  const token =
+  await getCSRF();
+
+  const res =
+  await fetch("/api/register",{
+
     method:"POST",
+
     credentials:"include",
+
     headers:{
-      "Content-Type":"application/json",
-      "CSRF-Token":token
+
+      "Content-Type":
+      "application/json",
+
+      "CSRF-Token":
+      token
     },
+
     body:JSON.stringify({
-      username:regUser.value,
-      password:regPass.value
+
+      username:
+      regUser.value,
+
+      password:
+      regPass.value
     })
   });
 
-  const data = await res.json();
-  console.log(data);
-  showMsg(data.message, data.success ? "success" : "error");
+  const data =
+  await res.json();
 
-  if (data.success) {
-    setTimeout(showLogin, 1000);
+  showMsg(
+    data.message,
+    data.success
+    ? "success"
+    : "error"
+  );
+
+  if(data.success){
+
+    setTimeout(
+      showLogin,
+      1000
+    );
   }
 }
 
 /* ================= LOGIN ================= */
-async function login() {
-  const token = await getCSRF();
 
-  const res = await fetch("/api/login", {
+async function login(){
+
+  const token =
+  await getCSRF();
+
+  const res =
+  await fetch("/api/login",{
+
     method:"POST",
+
     credentials:"include",
+
     headers:{
-      "Content-Type":"application/json",
-      "CSRF-Token":token
+
+      "Content-Type":
+      "application/json",
+
+      "CSRF-Token":
+      token
     },
+
     body:JSON.stringify({
+
       username:user.value,
+
       password:pass.value
     })
   });
 
-  const data = await res.json();
-  showMsg(data.message, data.success ? "success" : "error");
+  const data =
+  await res.json();
 
-  if (data.success) {
-    loginBox.classList.add("hidden");
-    otpBox.classList.remove("hidden");
+  showMsg(
+    data.message,
+    data.success
+    ? "success"
+    : "error"
+  );
 
-    startTimer(); // 🔥 TIMER START
+  if(data.success){
+
+    loginBox
+    .classList
+    .add("hidden");
+
+    otpBox
+    .classList
+    .remove("hidden");
+
+    startTimer();
   }
 }
 
 /* ================= VERIFY OTP ================= */
-async function verifyOtp() {
-  const token = await getCSRF();
 
-  const res = await fetch("/api/verify-otp", {
+async function verifyOtp(){
+
+  const token =
+  await getCSRF();
+
+  const res =
+  await fetch("/api/verify-otp",{
+
     method:"POST",
+
     credentials:"include",
+
     headers:{
-      "Content-Type":"application/json",
-      "CSRF-Token":token
+
+      "Content-Type":
+      "application/json",
+
+      "CSRF-Token":
+      token
     },
+
     body:JSON.stringify({
-      otp:otp.value
+
+      otp: otp.value,
+
+      username:
+      user.value
     })
   });
 
-  const data = await res.json();
-  if (data.success) {
+  const data =
+  await res.json();
 
-  welcomeText.innerText =
-  "Welcome, " + data.username;
+  showMsg(
+    data.message,
+    data.success
+    ? "success"
+    : "error"
+  );
 
-}
-  showMsg(data.message, data.success ? "success" : "error");
+  if(data.success){
 
-  if (data.success) {
-    localStorage.setItem("token", data.token);
-    clearInterval(timerInterval);
+    localStorage.setItem(
+      "token",
+      data.token
+    );
 
-    otpBox.classList.add("hidden");
-    dashboard.classList.remove("hidden");
+    clearInterval(
+      timerInterval
+    );
+
+    otpBox
+    .classList
+    .add("hidden");
+
+    dashboard
+    .classList
+    .remove("hidden");
+
+    welcomeText.innerText =
+    "✅ Welcome, " +
+    user.value;
   }
 }
 
 /* ================= RESEND OTP ================= */
-async function resendOtp() {
-  const token = await getCSRF();
 
-  const res = await fetch("/api/resend-otp", {
+async function resendOtp(){
+
+  const token =
+  await getCSRF();
+
+  const res =
+  await fetch("/api/resend-otp",{
+
     method:"POST",
+
     credentials:"include",
+
     headers:{
-      "Content-Type":"application/json",
-      "CSRF-Token":token
+
+      "Content-Type":
+      "application/json",
+
+      "CSRF-Token":
+      token
     }
   });
 
-  const data = await res.json();
- showMsg(data.message, data.success ? "success" : "error");
+  const data =
+  await res.json();
 
-  if (data.success) {
-    startTimer(); // 🔥 RESET TIMER
+  showMsg(
+    data.message,
+    data.success
+    ? "success"
+    : "error"
+  );
+
+  if(data.success){
+
+    startTimer();
   }
 }
 
-/* ================= FORGOT ================= */
-async function forgot() {
-  const token = await getCSRF();
+/* ================= FORGOT PASSWORD ================= */
 
-  if (!user.value) {
-    msg.innerText = "Enter username first";
+async function forgot(){
+
+  const token =
+  await getCSRF();
+
+  if(!user.value){
+
+    showMsg(
+      "Enter username first",
+      "error"
+    );
+
     return;
   }
 
-  const res = await fetch("/api/forgot-password", {
+  const res =
+  await fetch(
+    "/api/forgot-password",
+  {
+
     method:"POST",
+
     credentials:"include",
+
     headers:{
-      "Content-Type":"application/json",
-      "CSRF-Token":token
+
+      "Content-Type":
+      "application/json",
+
+      "CSRF-Token":
+      token
     },
+
     body:JSON.stringify({
-      username: user.value
+
+      username:
+      user.value
     })
   });
 
-  const data = await res.json();
-  showMsg(data.message, data.success ? "success" : "error");
+  const data =
+  await res.json();
 
-  resetBox.classList.remove("hidden");
+  showMsg(
+    data.message,
+    data.success
+    ? "success"
+    : "error"
+  );
+
+  resetBox
+  .classList
+  .remove("hidden");
 }
 
-/* ================= RESET ================= */
-async function resetPassword() {
-  const token = await getCSRF();
+/* ================= RESET PASSWORD ================= */
 
-  const res = await fetch("/api/reset-password", {
+async function resetPassword(){
+
+  const token =
+  await getCSRF();
+
+  const res =
+  await fetch(
+    "/api/reset-password",
+  {
+
     method:"POST",
+
     credentials:"include",
+
     headers:{
-      "Content-Type":"application/json",
-      "CSRF-Token":token
+
+      "Content-Type":
+      "application/json",
+
+      "CSRF-Token":
+      token
     },
+
     body:JSON.stringify({
-      token:resetToken.value,
-      newPassword:newPass.value
+
+      token:
+      resetToken.value,
+
+      newPassword:
+      newPass.value
     })
   });
 
-  const data = await res.json();
-  showMsg(data.message, data.success ? "success" : "error");
+  const data =
+  await res.json();
 
-  if (data.success) {
+  showMsg(
+    data.message,
+    data.success
+    ? "success"
+    : "error"
+  );
+
+  if(data.success){
+
     showLogin();
   }
 }
 
-async function getProfile() {
+/* ================= PROFILE ================= */
+
+async function getProfile(){
 
   const token =
-  localStorage.getItem("token");
+  localStorage.getItem(
+    "token"
+  );
 
-  const res = await fetch("/api/profile", {
+  const res =
+  await fetch("/api/profile",{
 
-    headers: {
+    headers:{
       Authorization: token
     }
-
   });
 
-  const data = await res.json();
+  const data =
+  await res.json();
 
   showMsg(
     data.message,
-    data.success ? "success" : "error"
+    data.success
+    ? "success"
+    : "error"
   );
 }
 
 /* ================= LOGOUT ================= */
-function logout() {
-  localStorage.removeItem("token");
+
+function logout(){
+
+  localStorage.removeItem(
+    "token"
+  );
+
   location.reload();
 }
 
@@ -430,3 +816,4 @@ function logout() {
 
 </body>
 </html>
+```
