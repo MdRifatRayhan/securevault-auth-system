@@ -141,7 +141,9 @@ button {
 <!-- DASHBOARD -->
 <div id="dashboard" class="hidden">
 <h2>✅ Welcome</h2>
-<p>Secure Login Successful</p>
+<p id="welcomeText">
+Secure Login Successful
+</p>
 <button onclick="getProfile()">
 Check Protected Route
 </button>
@@ -314,6 +316,8 @@ async function verifyOtp() {
 
     otpBox.classList.add("hidden");
     dashboard.classList.remove("hidden");
+    welcomeText.innerText =
+"Welcome, " + user.value;
   }
 }
 

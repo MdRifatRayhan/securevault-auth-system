@@ -27,9 +27,12 @@ function auth(req, res, next) {
 
   try {
 
-    jwt.verify(token, SECRET);
+   const decoded =
+jwt.verify(token, SECRET);
 
-    next();
+req.user = decoded.user;
+
+next();
 
   } catch {
 
@@ -58,7 +61,7 @@ const User = mongoose.model("User", {
 /* TEMP */
 let currentOTP = "";
 let otpTime = 0;
-let lastUser = ""; // 🔥 track current user
+let otpUser = "";// 🔥 track current user
 
 /* CSRF */
 app.get("/api/csrf-token", csrfProtection, (req, res) => {
@@ -156,7 +159,7 @@ app.post("/api/login", csrfProtection, async (req, res) => {
 
   currentOTP = Math.floor(100000 + Math.random() * 900000).toString();
   otpTime = Date.now();
-  lastUser = username;
+  otpUser = username;
 
   console.log("OTP:", currentOTP);
 
@@ -188,11 +191,14 @@ app.post("/api/verify-otp", csrfProtection, (req, res) => {
 
   if (otp === currentOTP) {
 
-    currentOTP = "";
-    otpTime = 0;
-    lastUser = "";
+    const token = jwt.sign(
+  { user: otpUser },
+  SECRET
+);
 
-    const token = jwt.sign({ user: "demo" }, SECRET);
+currentOTP = "";
+otpTime = 0;
+otpUser = "";
 
     return res.json({
       success: true,
@@ -262,10 +268,10 @@ app.post("/api/reset-password", csrfProtection, async (req, res) => {
 
 app.get("/api/profile", auth, (req, res) => {
 
-  res.json({
-    success: true,
-    message: "Protected data accessed"
-  });
+ res.json({
+  success: true,
+  message: "Welcome, " + req.user
+});
 
 });
 
