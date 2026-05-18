@@ -417,6 +417,10 @@ async function getProfile() {
 
 /* ================= LOGOUT ================= */
 function logout() {
+  localStorage.removeItem("token");
+  location.reload();
+}
+
   /* ================= AUTO LOGIN ================= */
 
 window.onload = async function () {
@@ -455,9 +459,6 @@ window.onload = async function () {
 
   }
 };
-  localStorage.removeItem("token");
-  location.reload();
-}
 
 </script>
 
