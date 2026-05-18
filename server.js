@@ -62,7 +62,7 @@ const User = mongoose.model("User", {
 /* TEMP */
 let currentOTP = "";
 let otpTime = 0;
-let lastUser = ""; // 🔥 track current user
+// 🔥 track current user
 
 /* CSRF */
 app.get("/api/csrf-token", csrfProtection, (req, res) => {
@@ -160,7 +160,7 @@ app.post("/api/login", csrfProtection, async (req, res) => {
 
   currentOTP = Math.floor(100000 + Math.random() * 900000).toString();
   otpTime = Date.now();
-  lastUser = username;
+
 
   console.log("OTP:", currentOTP);
 
@@ -196,8 +196,8 @@ app.post("/api/verify-otp", csrfProtection, (req, res) => {
     otpTime = 0;
     lastUser = "";
 
-    const token = jwt.sign(
-  { user: lastUser },
+  const token = jwt.sign(
+  { user: "Authenticated User" },
   SECRET
 );
 console.log("TOKEN USER:", lastUser);
