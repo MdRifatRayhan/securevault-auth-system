@@ -169,9 +169,12 @@ app.post("/api/login", csrfProtection, async (req, res) => {
 /* 🔥 RESEND OTP */
 app.post("/api/resend-otp", csrfProtection, (req, res) => {
 
-  if (!lastUser) {
-    return res.json({ success: false, message: "Login first" });
-  }
+ if (!otpUser) {
+  return res.json({
+    success: false,
+    message: "Login first"
+  });
+}
 
   currentOTP = Math.floor(100000 + Math.random() * 900000).toString();
   otpTime = Date.now();
