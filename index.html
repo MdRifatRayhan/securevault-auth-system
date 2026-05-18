@@ -306,6 +306,13 @@ if (!data.success) {
   dashboard.classList.add("hidden");
 
   loginBox.classList.remove("hidden");
+
+  showMsg(
+    "Session expired. Login again.",
+    "error"
+  );
+
+  return;
 }
 
 showMsg(
