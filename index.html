@@ -135,7 +135,14 @@ button {
 <p id="timer"></p>
 
 <button onclick="verifyOtp()">Verify OTP</button>
-<button class="secondary" onclick="resendOtp()">Resend OTP</button>
+<button
+id="resendBtn"
+class="secondary"
+onclick="resendOtp()">
+
+Resend OTP
+
+</button>
 </div>
 
 <!-- DASHBOARD -->
@@ -182,6 +189,8 @@ async function getCSRF() {
 /* ================= TIMER ================= */
 let timeLeft = 45;
 let timerInterval;
+let resendCooldown = 30;
+let resendInterval;
 
 function startTimer() {
   timeLeft = 45;
@@ -198,6 +207,39 @@ function startTimer() {
       clearInterval(timerInterval);
       document.getElementById("timer").innerText = "❌ OTP expired";
     }
+  }, 1000);
+}
+
+function startResendCooldown() {
+
+  resendBtn.disabled = true;
+
+  resendCooldown = 30;
+
+  resendBtn.innerText =
+  "Resend in " +
+  resendCooldown + "s";
+
+  clearInterval(resendInterval);
+
+  resendInterval = setInterval(() => {
+
+    resendCooldown--;
+
+    resendBtn.innerText =
+    "Resend in " +
+    resendCooldown + "s";
+
+    if (resendCooldown <= 0) {
+
+      clearInterval(resendInterval);
+
+      resendBtn.disabled = false;
+
+      resendBtn.innerText =
+      "Resend OTP";
+    }
+
   }, 1000);
 }
 
@@ -288,6 +330,7 @@ async function login() {
     otpBox.classList.remove("hidden");
 
     startTimer(); // 🔥 TIMER START
+    startResendCooldown();
   }
 }
 
@@ -337,9 +380,12 @@ async function resendOtp() {
   const data = await res.json();
  showMsg(data.message, data.success ? "success" : "error");
 
-  if (data.success) {
-    startTimer(); // 🔥 RESET TIMER
-  }
+  if(data.success){
+
+  startTimer();
+
+  startResendCooldown();
+}
 }
 
 /* ================= FORGOT ================= */
