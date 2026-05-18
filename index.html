@@ -417,6 +417,44 @@ async function getProfile() {
 
 /* ================= LOGOUT ================= */
 function logout() {
+  /* ================= AUTO LOGIN ================= */
+
+window.onload = async function () {
+
+  const token =
+  localStorage.getItem("token");
+
+  if (!token) return;
+
+  try {
+
+    const res = await fetch("/api/profile", {
+
+      headers: {
+        Authorization: token
+      }
+
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+
+      loginBox.classList.add("hidden");
+
+      dashboard.classList.remove("hidden");
+
+      welcomeText.innerText =
+      data.message;
+
+    }
+
+  } catch (err) {
+
+    console.log(err);
+
+  }
+};
   localStorage.removeItem("token");
   location.reload();
 }
