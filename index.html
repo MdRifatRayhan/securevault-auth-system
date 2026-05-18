@@ -298,7 +298,20 @@ if (!strongPassword.test(regPass.value)) {
   });
 
   const data = await res.json();
-  showMsg(data.message, data.success ? "success" : "error");
+
+if (!data.success) {
+
+  localStorage.removeItem("token");
+
+  dashboard.classList.add("hidden");
+
+  loginBox.classList.remove("hidden");
+}
+
+showMsg(
+  data.message,
+  data.success ? "success" : "error"
+);
 
   if (data.success) {
     setTimeout(showLogin, 1000);
@@ -474,8 +487,21 @@ async function getProfile() {
 
 /* ================= LOGOUT ================= */
 function logout() {
+
   localStorage.removeItem("token");
-  location.reload();
+
+  dashboard.classList.add("hidden");
+
+  loginBox.classList.remove("hidden");
+
+  user.value = "";
+  pass.value = "";
+  otp.value = "";
+
+  showMsg(
+    "Logged out successfully",
+    "success"
+  );
 }
 
   /* ================= AUTO LOGIN ================= */
@@ -499,16 +525,23 @@ window.onload = async function () {
 
     const data = await res.json();
 
-    if (data.success) {
+   if (data.success) {
 
-      loginBox.classList.add("hidden");
+  loginBox.classList.add("hidden");
 
-      dashboard.classList.remove("hidden");
+  dashboard.classList.remove("hidden");
 
-      welcomeText.innerText =
-      data.message;
+  welcomeText.innerText =
+  data.message;
 
-    }
+} else {
+
+  localStorage.removeItem("token");
+
+  dashboard.classList.add("hidden");
+
+  loginBox.classList.remove("hidden");
+}
 
   } catch (err) {
 
