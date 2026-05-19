@@ -108,6 +108,71 @@ button {
   margin:5px 0;
   font-size:14px;
 }
+.dashboard-card{
+
+  padding:25px;
+
+  border-radius:20px;
+
+  background:
+  rgba(255,255,255,0.12);
+
+  backdrop-filter: blur(15px);
+
+  box-shadow:
+  0 8px 30px rgba(0,0,0,0.3);
+
+  animation:
+  fadeIn 0.5s ease;
+}
+
+.history-box{
+
+  margin-top:20px;
+
+  padding:15px;
+
+  border-radius:15px;
+
+  background:
+  rgba(255,255,255,0.08);
+}
+
+#dashboardTitle{
+
+  margin-bottom:10px;
+}
+
+#welcomeText{
+
+  font-size:18px;
+
+  margin-bottom:10px;
+}
+
+#lastLoginText{
+
+  font-size:14px;
+
+  opacity:0.9;
+}
+
+@keyframes fadeIn{
+
+  from{
+
+    opacity:0;
+    transform:
+    translateY(15px);
+  }
+
+  to{
+
+    opacity:1;
+    transform:
+    translateY(0);
+  }
+}
 </style>
 </head>
 
@@ -166,6 +231,38 @@ Resend OTP
 
 <!-- DASHBOARD -->
 <div id="dashboard" class="hidden">
+
+  <div class="dashboard-card">
+
+    <h2 id="dashboardTitle">
+      ✅ Welcome
+    </h2>
+
+    <p id="welcomeText">
+      Secure Login Successful
+    </p>
+
+    <p id="lastLoginText"></p>
+
+    <div class="history-box">
+
+      <h3>Recent Logins</h3>
+
+      <ul id="historyList"></ul>
+
+    </div>
+
+    <button onclick="getProfile()">
+      Check Protected Route
+    </button>
+
+    <button onclick="logout()">
+      Logout
+    </button>
+
+  </div>
+
+</div>
 <h2 id="dashboardTitle">
 ✅ Welcome
 </h2>
