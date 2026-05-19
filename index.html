@@ -173,6 +173,12 @@ button {
     translateY(0);
   }
 }
+button:disabled{
+
+  opacity:0.6;
+
+  cursor:not-allowed;
+}
 </style>
 </head>
 
@@ -470,6 +476,18 @@ showMsg(
 
 /* ================= LOGIN ================= */
 async function login() {
+const buttons =
+document.querySelectorAll("button");
+
+const loginBtn =
+document.querySelector(
+'button[onclick="login()"]'
+);
+
+loginBtn.disabled = true;
+
+loginBtn.innerText =
+"Logging in...";
   const token = await getCSRF();
 
   const res = await fetch("/api/login", {
@@ -486,6 +504,10 @@ async function login() {
   });
 
   const data = await res.json();
+  loginBtn.disabled = false;
+
+loginBtn.innerText =
+"Login";
   showMsg(data.message, data.success ? "success" : "error");
 
   if (data.success) {
