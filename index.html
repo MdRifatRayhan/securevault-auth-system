@@ -442,14 +442,11 @@ async function verifyOtp() {
     otpBox.classList.add("hidden");
    dashboard.classList.remove("hidden");
 
-const currentUser =
-user.value;
+otpBox.classList.add("hidden");
 
-welcomeText.innerText =
-"Welcome, " + currentUser;
+dashboard.classList.remove("hidden");
 
-dashboardTitle.innerText =
-"✅ " + currentUser + "'s Dashboard";
+await getProfile();
 
 getProfile();
   }
