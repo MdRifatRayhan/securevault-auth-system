@@ -56,7 +56,11 @@ const User = mongoose.model("User", {
   resetToken: String,
   loginAttempts: { type: Number, default: 0 },
   lockUntil: { type: Number, default: 0 },
-  lastLogin: String
+  lastLogin: String,
+  loginHistory: {
+  type: [String],
+  default: []
+}
 });
 
 /* TEMP */
@@ -159,8 +163,17 @@ app.post("/api/login", csrfProtection, async (req, res) => {
 
 user.lockUntil = 0;
 
-user.lastLogin =
+const loginTime =
 new Date().toLocaleString();
+
+user.lastLogin = loginTime;
+
+user.loginHistory.unshift(loginTime);
+
+if (user.loginHistory.length > 5) {
+
+  user.loginHistory.pop();
+}
 
 await user.save();
 
@@ -326,8 +339,11 @@ app.get("/api/profile", auth, async (req, res) => {
     message:
     "Welcome, " + req.user,
 
-    lastLogin:
-    user.lastLogin
+   lastLogin:
+user.lastLogin,
+
+loginHistory:
+user.loginHistory
 
   });
 

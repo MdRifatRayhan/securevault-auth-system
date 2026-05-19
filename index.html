@@ -99,6 +99,15 @@ button {
   font-size:14px;
   font-weight:bold;
 }
+#historyList{
+  margin-top:10px;
+  padding-left:20px;
+}
+
+#historyList li{
+  margin:5px 0;
+  font-size:14px;
+}
 </style>
 </head>
 
@@ -163,6 +172,9 @@ Secure Login Successful
 </p>
 
 <p id="lastLoginText"></p>
+<h3>Recent Logins</h3>
+
+<ul id="historyList"></ul>
 <button onclick="getProfile()">
 Check Protected Route
 </button>
@@ -611,6 +623,14 @@ window.onload = async function () {
   data.message;
   lastLoginText.innerText =
 "Last Login: " + data.lastLogin;
+historyList.innerHTML = "";
+
+data.loginHistory.forEach(item => {
+
+  historyList.innerHTML +=
+  `<li>${item}</li>`;
+
+});
 
 } else {
 
