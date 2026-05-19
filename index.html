@@ -179,6 +179,48 @@ button:disabled{
 
   cursor:not-allowed;
 }
+#toast{
+
+  position:fixed;
+
+  top:20px;
+  right:20px;
+
+  padding:15px 20px;
+
+  border-radius:12px;
+
+  color:white;
+
+  font-weight:bold;
+
+  opacity:0;
+
+  transform:
+  translateY(-20px);
+
+  transition:0.3s;
+
+  z-index:999;
+}
+
+.toast-success{
+
+  background:#2ecc71;
+}
+
+.toast-error{
+
+  background:#e74c3c;
+}
+
+.toast-show{
+
+  opacity:1;
+
+  transform:
+  translateY(0);
+}
 </style>
 </head>
 
@@ -284,12 +326,27 @@ Resend OTP
 
 <script>
 
-  function showMsg(message, type="success") {
-  msg.innerText = message;
+ function showMsg(message, type="success") {
 
-  msg.className = "";
+  toast.innerText = message;
 
-  msg.classList.add(type);
+  toast.className = "";
+
+  toast.classList.add(
+    type === "success"
+    ? "toast-success"
+    : "toast-error"
+  );
+
+  toast.classList.add("toast-show");
+
+  setTimeout(() => {
+
+    toast.classList.remove(
+      "toast-show"
+    );
+
+  }, 3000);
 }
 
 /* ================= CSRF ================= */
@@ -778,6 +835,7 @@ data.loginHistory.forEach(item => {
 };
 
 </script>
+<div id="toast"></div>
 
 </body>
 </html>
