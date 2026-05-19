@@ -31,6 +31,10 @@ function auth(req, res, next) {
 jwt.verify(token, SECRET);
 
 req.user = decoded.user;
+console.log(
+  "TOKEN USER:",
+  decoded
+);
 
 next();
 
