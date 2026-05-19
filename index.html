@@ -151,6 +151,8 @@ Resend OTP
 <p id="welcomeText">
 Secure Login Successful
 </p>
+
+<p id="lastLoginText"></p>
 <button onclick="getProfile()">
 Check Protected Route
 </button>
@@ -378,9 +380,12 @@ async function verifyOtp() {
     clearInterval(timerInterval);
 
     otpBox.classList.add("hidden");
-    dashboard.classList.remove("hidden");
-    welcomeText.innerText =
+   dashboard.classList.remove("hidden");
+
+welcomeText.innerText =
 "Welcome, " + user.value;
+
+getProfile();
   }
 }
 
@@ -558,6 +563,8 @@ window.onload = async function () {
 
   welcomeText.innerText =
   data.message;
+  lastLoginText.innerText =
+"Last Login: " + data.lastLogin;
 
 } else {
 

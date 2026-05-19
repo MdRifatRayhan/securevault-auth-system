@@ -55,7 +55,8 @@ const User = mongoose.model("User", {
   password: String,
   resetToken: String,
   loginAttempts: { type: Number, default: 0 },
-  lockUntil: { type: Number, default: 0 }
+  lockUntil: { type: Number, default: 0 },
+  lastLogin: String
 });
 
 /* TEMP */
@@ -155,8 +156,13 @@ app.post("/api/login", csrfProtection, async (req, res) => {
   }
 
   user.loginAttempts = 0;
-  user.lockUntil = 0;
-  await user.save();
+
+user.lockUntil = 0;
+
+user.lastLogin =
+new Date().toLocaleString();
+
+await user.save();
 
   currentOTP =
 Math.floor(100000 + Math.random() * 900000).toString();
@@ -306,12 +312,24 @@ app.post("/api/reset-password", csrfProtection, async (req, res) => {
   res.json({ success: true, message: "Password reset successful" });
 });
 
-app.get("/api/profile", auth, (req, res) => {
+app.get("/api/profile", auth, async (req, res) => {
 
- res.json({
-  success: true,
-  message: "Welcome, " + req.user
-});
+  const user =
+  await User.findOne({
+    username: req.user
+  });
+
+  res.json({
+
+    success: true,
+
+    message:
+    "Welcome, " + req.user,
+
+    lastLogin:
+    user.lastLogin
+
+  });
 
 });
 
