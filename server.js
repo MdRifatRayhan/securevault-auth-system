@@ -222,81 +222,84 @@ otpAttempts = 0;
 });
 
 /* VERIFY OTP */
-app.post("/api/verify-otp",
-csrfProtection,
-async (req, res) => {
+/* VERIFY OTP */
+app.post("/api/verify-otp", csrfProtection, async (req, res) => {
+
   const { otp } = req.body;
 
-  if (!otpTime || Date.now() - otpTime > 45000) {
-    return res.json({ success: false, message: "OTP expired" });
+  if (!otpTime ||
+      Date.now() - otpTime > 45000) {
+
+    return res.json({
+      success: false,
+      message: "OTP expired"
+    });
   }
 
   if (otp !== currentOTP) {
 
-  otpAttempts++;
+    otpAttempts++;
 
-  if (otpAttempts >= 3) {
+    if (otpAttempts >= 3) {
 
-    currentOTP = "";
-    otpTime = 0;
-    otpUser = "";
-    otpAttempts = 0;
+      currentOTP = "";
+      otpTime = 0;
+      otpUser = "";
+      otpAttempts = 0;
+
+      return res.json({
+        success: false,
+        message:
+        "Too many wrong OTP attempts. Login again."
+      });
+    }
 
     return res.json({
       success: false,
       message:
-      "Too many wrong OTP attempts. Login again."
+      "Wrong OTP. Attempts left: " +
+      (3 - otpAttempts)
     });
   }
 
-  return res.json({
-    success: false,
-    message:
-    "Wrong OTP. Attempts left: " +
-    (3 - otpAttempts)
-  });
-}
+  const loggedInUser = otpUser;
 
-  if (otp === currentOTP) {
+  currentOTP = "";
+  otpTime = 0;
+  otpUser = "";
+  otpAttempts = 0;
 
   const token = jwt.sign(
 
-  { user: otpUser },
+    { user: loggedInUser },
 
-  SECRET,
+    SECRET,
 
-  { expiresIn: "1m" }
+    { expiresIn: "1m" }
 
-);
+  );
 
-currentOTP = "";
-otpTime = 0;
-otpUser = "";
-otpAttempts = 0;
+  const userData =
+  await User.findOne({
+    username: loggedInUser
+  });
 
-    const userData =
-await User.findOne({
-  username: loggedInUser
-});
+  return res.json({
 
-return res.json({
+    success: true,
 
-  success: true,
+    message: "Login successful",
 
-  message: "Login successful",
+    token: token,
 
-  token: token,
+    username: loggedInUser,
 
-  username: loggedInUser,
+    lastLogin:
+    userData.lastLogin,
 
-  lastLogin:
-  userData.lastLogin,
-
-  loginHistory:
-  userData.loginHistory
-});
-  }
-
+    loginHistory:
+    userData.loginHistory
+  });
 
 });
 
