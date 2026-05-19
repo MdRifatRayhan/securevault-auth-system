@@ -38,13 +38,17 @@ console.log(
 
 next();
 
-  } catch {
+} catch (err) {
 
-    res.json({
-      success: false,
-      message: "Invalid token"
-    });
-  }
+  res.json({
+
+    success: false,
+
+    message:
+    "Session expired. Login again."
+
+  });
+}
 }
 
 /* DB */
@@ -253,9 +257,14 @@ app.post("/api/verify-otp", csrfProtection, (req, res) => {
 
   if (otp === currentOTP) {
 
-    const token = jwt.sign(
+  const token = jwt.sign(
+
   { user: otpUser },
-  SECRET
+
+  SECRET,
+
+  { expiresIn: "1m" }
+
 );
 
 currentOTP = "";
