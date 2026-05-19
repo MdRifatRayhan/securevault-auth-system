@@ -435,21 +435,22 @@ async function verifyOtp() {
   const data = await res.json();
   showMsg(data.message, data.success ? "success" : "error");
 
-  if (data.success) {
-    localStorage.setItem("token", data.token);
-    clearInterval(timerInterval);
+if (data.success) {
+
+  localStorage.setItem("token", data.token);
+
+  clearInterval(timerInterval);
+
+  setTimeout(async () => {
 
     otpBox.classList.add("hidden");
-   dashboard.classList.remove("hidden");
 
-otpBox.classList.add("hidden");
+    dashboard.classList.remove("hidden");
 
-dashboard.classList.remove("hidden");
+    await getProfile();
 
-await getProfile();
-
-getProfile();
-  }
+  }, 300);
+}
 }
 
 /* ================= RESEND OTP ================= */
