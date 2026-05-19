@@ -94,6 +94,11 @@ button {
 .hidden {
   display:none;
 }
+#strengthText{
+  margin-top:5px;
+  font-size:14px;
+  font-weight:bold;
+}
 </style>
 </head>
 
@@ -122,7 +127,12 @@ button {
 <div id="registerBox" class="hidden">
 <h2>🆕 Create Account</h2>
 <input id="regUser" placeholder="Username">
-<input id="regPass" type="password" placeholder="Password (8 chars, uppercase, number, special)">
+<input
+id="regPass"
+type="password"
+placeholder="Password (8 chars, uppercase, number, special)"
+oninput="checkStrength()">
+<p id="strengthText"></p>
 <button onclick="register()">Register</button>
 <button class="secondary" onclick="showLogin()">Back to Login</button>
 </div>
@@ -248,6 +258,42 @@ function startResendCooldown() {
 /* ================= PASSWORD TOGGLE ================= */
 function togglePass() {
   pass.type = pass.type === "password" ? "text" : "password";
+}
+
+function checkStrength() {
+
+  const password =
+  regPass.value;
+
+  let strength = "";
+
+  if (password.length < 6) {
+
+    strength = "Weak ❌";
+
+  }
+
+  else if (
+    password.match(/[A-Z]/) &&
+    password.match(/[0-9]/)
+  ) {
+
+    strength = "Medium ⚠️";
+
+  }
+
+  if (
+    password.match(/[A-Z]/) &&
+    password.match(/[0-9]/) &&
+    password.match(/[@$!%*?&#]/) &&
+    password.length >= 8
+  ) {
+
+    strength = "Strong ✅";
+  }
+
+  strengthText.innerText =
+  "Password Strength: " + strength;
 }
 
 /* ================= DARK MODE ================= */
