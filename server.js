@@ -222,7 +222,9 @@ otpAttempts = 0;
 });
 
 /* VERIFY OTP */
-app.post("/api/verify-otp", csrfProtection, (req, res) => {
+app.post("/api/verify-otp",
+csrfProtection,
+async (req, res) => {
   const { otp } = req.body;
 
   if (!otpTime || Date.now() - otpTime > 45000) {
@@ -272,11 +274,27 @@ otpTime = 0;
 otpUser = "";
 otpAttempts = 0;
 
-    return res.json({
-      success: true,
-      message: "Login successful",
-      token: token
-    });
+    const userData =
+await User.findOne({
+  username: loggedInUser
+});
+
+return res.json({
+
+  success: true,
+
+  message: "Login successful",
+
+  token: token,
+
+  username: loggedInUser,
+
+  lastLogin:
+  userData.lastLogin,
+
+  loginHistory:
+  userData.loginHistory
+});
   }
 
 

@@ -441,15 +441,30 @@ if (data.success) {
 
   clearInterval(timerInterval);
 
-  setTimeout(async () => {
+ otpBox.classList.add("hidden");
 
-    otpBox.classList.add("hidden");
+dashboard.classList.remove("hidden");
 
-    dashboard.classList.remove("hidden");
+welcomeText.innerText =
+"Welcome, " + data.username;
 
-    await getProfile();
+dashboardTitle.innerText =
+"✅ " +
+data.username +
+"'s Dashboard";
 
-  }, 300);
+lastLoginText.innerText =
+"Last Login: " +
+data.lastLogin;
+
+historyList.innerHTML = "";
+
+data.loginHistory.forEach(item => {
+
+  historyList.innerHTML +=
+  `<li>${item}</li>`;
+
+});
 }
 }
 
