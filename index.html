@@ -166,7 +166,9 @@ Resend OTP
 
 <!-- DASHBOARD -->
 <div id="dashboard" class="hidden">
-<h2>✅ Welcome</h2>
+<h2 id="dashboardTitle">
+✅ Welcome
+</h2>
 <p id="welcomeText">
 Secure Login Successful
 </p>
@@ -440,8 +442,14 @@ async function verifyOtp() {
     otpBox.classList.add("hidden");
    dashboard.classList.remove("hidden");
 
+const currentUser =
+user.value;
+
 welcomeText.innerText =
-"Welcome, " + user.value;
+"Welcome, " + currentUser;
+
+dashboardTitle.innerText =
+"✅ " + currentUser + "'s Dashboard";
 
 getProfile();
   }
@@ -621,6 +629,11 @@ window.onload = async function () {
 
   welcomeText.innerText =
   data.message;
+  const username =
+data.message.replace("Welcome, ", "");
+
+dashboardTitle.innerText =
+"✅ " + username + "'s Dashboard";
   lastLoginText.innerText =
 "Last Login: " + data.lastLogin;
 historyList.innerHTML = "";
