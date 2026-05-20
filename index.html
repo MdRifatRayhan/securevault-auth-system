@@ -286,15 +286,7 @@ body.dark .history-box{
   background:
   rgba(255,255,255,0.05);
 }
-#adminPanel{
 
-  width:100%;
-}
-
-.dashboard-card{
-
-  text-align:center;
-}
 </style>
 </head>
 
@@ -379,11 +371,9 @@ Resend OTP
       <ul id="historyList"></ul>
 
     </div>
-   <div
-id="adminPanel"
-class="hidden card">
+<div id="adminPanel" class="hidden">
 
-  <div class="dashboard-card">
+  <div class="card">
 
     <h2>
       🛡 Admin Panel
@@ -393,8 +383,12 @@ class="hidden card">
       Welcome Admin
     </p>
 
-    <button onclick="closeAdminPanel()">
+    <button
+    type="button"
+    onclick="closeAdminPanel()">
+
       Back
+
     </button>
 
   </div>
