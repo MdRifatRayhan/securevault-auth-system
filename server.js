@@ -286,6 +286,13 @@ app.post("/api/verify-otp", csrfProtection, async (req, res) => {
   otpUser = "";
   otpAttempts = 0;
 
+  const userData =
+await User.findOne({
+
+  username: loggedInUser
+
+});
+
  const token = jwt.sign(
 
   {
@@ -302,10 +309,6 @@ app.post("/api/verify-otp", csrfProtection, async (req, res) => {
 
 );
 
-  const userData =
-  await User.findOne({
-    username: loggedInUser
-  });
 
   return res.json({
 
