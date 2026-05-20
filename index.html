@@ -537,15 +537,27 @@ function toggleMode() {
 
 /* ================= NAVIGATION ================= */
 function showRegister() {
+
   loginBox.classList.add("hidden");
+
   registerBox.classList.remove("hidden");
+
+  registerBox.classList.add("fade");
 }
 
 function showLogin() {
+
   registerBox.classList.add("hidden");
+
   resetBox.classList.add("hidden");
+
   otpBox.classList.add("hidden");
+
+  dashboard.classList.add("hidden");
+
   loginBox.classList.remove("hidden");
+
+  loginBox.classList.add("fade");
 }
 
 /* ================= REGISTER ================= */
@@ -680,6 +692,7 @@ if (data.success) {
  otpBox.classList.add("hidden");
 
 dashboard.classList.remove("hidden");
+dashboard.classList.add("fade");
 
 welcomeText.innerText =
 "Welcome, " + data.username;
@@ -915,6 +928,30 @@ if (
 ) {
 
   document.body.classList.add("dark");
+}
+.fade{
+
+  animation:
+  fadeEffect 0.4s ease;
+}
+
+@keyframes fadeEffect{
+
+  from{
+
+    opacity:0;
+
+    transform:
+    translateY(10px);
+  }
+
+  to{
+
+    opacity:1;
+
+    transform:
+    translateY(0);
+  }
 }
 
 </script>
