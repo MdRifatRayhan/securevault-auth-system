@@ -370,13 +370,37 @@ Resend OTP
       <ul id="historyList"></ul>
 
     </div>
+    <div id="adminPanel" class="hidden">
+
+  <div class="dashboard-card">
+
+    <h2>
+      🛡 Admin Panel
+    </h2>
+
+    <p>
+      Welcome Admin
+    </p>
+
+    <button onclick="closeAdminPanel()">
+      Back
+    </button>
+
+  </div>
+
+</div>
 
     <button onclick="getProfile()">
       Check Protected Route
     </button>
-    <button
+   <button
 id="adminBtn"
-class="hidden">
+class="hidden"
+onclick="openAdminPanel()">
+
+Admin Panel
+
+</button>
 
 Admin Panel
 
@@ -844,6 +868,27 @@ async function getProfile() {
 }
 
 /* ================= LOGOUT ================= */
+function openAdminPanel() {
+
+  dashboard.classList.add(
+    "hidden"
+  );
+
+  adminPanel.classList.remove(
+    "hidden"
+  );
+}
+
+function closeAdminPanel() {
+
+  adminPanel.classList.add(
+    "hidden"
+  );
+
+  dashboard.classList.remove(
+    "hidden"
+  );
+}
 function logout() {
 
   localStorage.removeItem("token");
