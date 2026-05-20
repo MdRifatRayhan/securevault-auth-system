@@ -19,6 +19,16 @@ body {
   background: linear-gradient(270deg,#667eea,#764ba2,#00c6ff);
   background-size: 600% 600%;
   animation: gradient 10s ease infinite;
+  body.dark{
+
+  background:
+  linear-gradient(
+    270deg,
+    #141e30,
+    #243b55,
+    #000000
+  );
+}
 }
 
 @keyframes gradient {
@@ -35,6 +45,25 @@ body {
   backdrop-filter: blur(20px);
   box-shadow: 0 10px 40px rgba(0,0,0,0.3);
   color:white;
+  body.dark .card{
+
+  background:
+  rgba(0,0,0,0.35);
+
+  color:white;
+}
+body.dark input{
+
+  background:
+  rgba(255,255,255,0.08);
+
+  color:white;
+}
+
+body.dark input::placeholder{
+
+  color:#ddd;
+}
 }
 
 h2, h3 {
@@ -235,6 +264,11 @@ button:hover{
   transform:translateY(-2px);
 
   transition:0.2s;
+}
+body.dark .history-box{
+
+  background:
+  rgba(255,255,255,0.05);
 }
 </style>
 </head>
