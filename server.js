@@ -61,6 +61,10 @@ const User = mongoose.model("User", {
   username: String,
   email: String,
   password: String,
+  role: {
+  type: String,
+  default: "user"
+},
   resetToken: String,
   loginAttempts: { type: Number, default: 0 },
   lockUntil: { type: Number, default: 0 },
@@ -112,7 +116,20 @@ if (!strongPassword.test(password)) {
 }
 
   const hash = await bcrypt.hash(password, 10);
-  await User.create({ username, email, password: hash });
+  await User.create({
+
+  username,
+
+  email,
+
+  password: hash,
+
+  role:
+  username === "admin"
+  ? "admin"
+  : "user"
+
+});
 
   res.json({ success: true, message: "Registered" });
 });
@@ -269,15 +286,21 @@ app.post("/api/verify-otp", csrfProtection, async (req, res) => {
   otpUser = "";
   otpAttempts = 0;
 
-  const token = jwt.sign(
+ const token = jwt.sign(
 
-    { user: loggedInUser },
+  {
 
-    SECRET,
+    user: loggedInUser,
 
-    { expiresIn: "1m" }
+    role: userData.role
 
-  );
+  },
+
+  SECRET,
+
+  { expiresIn: "1m" }
+
+);
 
   const userData =
   await User.findOne({
