@@ -11,15 +11,30 @@
 }
 
 body {
+
   font-family: Arial;
   height:100vh;
   display:flex;
   justify-content:center;
   align-items:center;
-  background: linear-gradient(270deg,#667eea,#764ba2,#00c6ff);
-  background-size: 600% 600%;
-  animation: gradient 10s ease infinite;
-  body.dark{
+
+  background:
+  linear-gradient(
+    270deg,
+    #667eea,
+    #764ba2,
+    #00c6ff
+  );
+
+  background-size:600% 600%;
+
+  animation:
+  gradient 10s ease infinite;
+
+  transition:0.4s;
+}
+
+body.dark {
 
   background:
   linear-gradient(
@@ -28,7 +43,8 @@ body {
     #243b55,
     #000000
   );
-}
+
+  background-size:600% 600%;
 }
 
 @keyframes gradient {
