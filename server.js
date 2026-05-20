@@ -317,6 +317,8 @@ app.post("/api/verify-otp", csrfProtection, async (req, res) => {
 
     username: loggedInUser,
 
+    role: userData.role,
+
     lastLogin:
     userData.lastLogin,
 

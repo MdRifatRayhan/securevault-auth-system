@@ -374,6 +374,13 @@ Resend OTP
     <button onclick="getProfile()">
       Check Protected Route
     </button>
+    <button
+id="adminBtn"
+class="hidden">
+
+Admin Panel
+
+</button>
 
     <button onclick="logout()">
       Logout
@@ -680,6 +687,12 @@ if (data.success) {
  otpBox.classList.add("hidden");
 
 dashboard.classList.remove("hidden");
+if (data.role === "admin") {
+
+  adminBtn.classList.remove(
+    "hidden"
+  );
+}
 
 welcomeText.innerText =
 "Welcome, " + data.username;
