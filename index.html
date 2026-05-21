@@ -667,14 +667,14 @@ if (usersData.success) {
   userList.innerHTML =
   "<h3>Users</h3>";
 
-  usersData.users.forEach(
-    (user) => {
+ usersData.users.forEach(
+  (u) => {
 
       userList.innerHTML +=
       `<p>
 
-        ${user.username}
-        (${user.role})
+       ${u.username}
+(${u.role})
 
       </p>`;
     }
