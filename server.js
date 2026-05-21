@@ -387,61 +387,65 @@ app.post("/api/reset-password", csrfProtection, async (req, res) => {
   res.json({ success: true, message: "Password reset successful" });
 });
 
-app.get("/api/profile", auth, async (req, res) => {
-  app.get("/api/admin/stats", auth, async (req, res) => {
-    app.use(express.static(__dirname));
-
-  try {
-
-    const totalUsers =
-    await User.countDocuments();
-
-    res.json({
-
-      success: true,
-
-      totalUsers
-
-    });
-
-  }
-
-  catch {
-
-    res.json({
-
-      success: false,
-
-      message:
-      "Failed to load stats"
-
-    });
-  }
-});
-
-  const user =
-  await User.findOne({
-    username: req.user
-  });
+/* PROFILE */
+app.get("/api/profile", auth, (req, res) => {
 
   res.json({
 
     success: true,
 
     message:
-    "Welcome, " + req.user,
-
-   lastLogin:
-user.lastLogin,
-
-loginHistory:
-user.loginHistory
+    "Protected data accessed"
 
   });
 
 });
+
+/* ADMIN STATS */
+app.get(
+  "/api/admin/stats",
+  auth,
+  async (req, res) => {
+
+    try {
+
+      const totalUsers =
+      await User.countDocuments();
+
+      res.json({
+
+        success: true,
+
+        totalUsers
+
+      });
+
+    }
+
+    catch {
+
+      res.json({
+
+        success: false,
+
+        message:
+        "Failed to load stats"
+
+      });
+
+    }
+
+  }
+);
+
+/* STATIC */
 app.use(express.static(__dirname));
 
+/* SERVER */
 app.listen(3000, () => {
-  console.log("Server running on http://localhost:3000");
+
+  console.log(
+    "Server running on http://localhost:3000"
+  );
+
 });
