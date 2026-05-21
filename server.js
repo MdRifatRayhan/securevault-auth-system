@@ -389,6 +389,7 @@ app.post("/api/reset-password", csrfProtection, async (req, res) => {
 
 app.get("/api/profile", auth, async (req, res) => {
   app.get("/api/admin/stats", auth, async (req, res) => {
+    app.use(express.static(__dirname));
 
   try {
 
@@ -439,8 +440,6 @@ user.loginHistory
   });
 
 });
-
-app.use(express.static(__dirname));
 
 app.listen(3000, () => {
   console.log("Server running on http://localhost:3000");
