@@ -437,6 +437,44 @@ app.get(
 
   }
 );
+app.get(
+  "/api/admin/users",
+  auth,
+  async (req, res) => {
+
+    try {
+
+      const users =
+      await User.find(
+        {},
+        "username role"
+      );
+
+      res.json({
+
+        success: true,
+
+        users
+
+      });
+
+    }
+
+    catch {
+
+      res.json({
+
+        success: false,
+
+        message:
+        "Failed to load users"
+
+      });
+
+    }
+
+  }
+);
 
 /* STATIC */
 app.use(express.static(__dirname));

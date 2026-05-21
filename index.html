@@ -415,6 +415,9 @@ Admin Panel
       Welcome Admin
     </p>
     <h3 id="totalUsers">
+      <div id="userList">
+
+</div>
   Total Users: ...
 </h3>
 
@@ -644,6 +647,39 @@ showMsg(
   if (data.success) {
     setTimeout(showLogin, 1000);
   }
+  const usersRes =
+await fetch(
+  "/api/admin/users",
+  {
+
+    headers: {
+
+      Authorization: token
+    }
+  }
+);
+
+const usersData =
+await usersRes.json();
+
+if (usersData.success) {
+
+  userList.innerHTML =
+  "<h3>Users</h3>";
+
+  usersData.users.forEach(
+    (user) => {
+
+      userList.innerHTML +=
+      `<p>
+
+        ${user.username}
+        (${user.role})
+
+      </p>`;
+    }
+  );
+}
 }
 
 /* ================= LOGIN ================= */
