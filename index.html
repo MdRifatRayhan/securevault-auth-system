@@ -925,6 +925,8 @@ async function openAdminPanel() {
   const token =
   localStorage.getItem("token");
 
+  /* TOTAL USERS */
+
   const res = await fetch(
     "/api/admin/stats",
     {
@@ -936,13 +938,52 @@ async function openAdminPanel() {
     }
   );
 
-  const data = await res.json();
+  const data =
+  await res.json();
 
   if (data.success) {
 
     totalUsers.innerText =
     "Total Users: " +
     data.totalUsers;
+  }
+
+  /* USER LIST */
+
+  const usersRes =
+  await fetch(
+    "/api/admin/users",
+    {
+
+      headers: {
+
+        Authorization: token
+      }
+    }
+  );
+
+  const usersData =
+  await usersRes.json();
+
+  console.log(usersData);
+
+  if (usersData.success) {
+
+    userList.innerHTML =
+    "<h3>Users</h3>";
+
+    usersData.users.forEach(
+      (u) => {
+
+        userList.innerHTML +=
+        `<p>
+
+          ${u.username}
+          (${u.role})
+
+        </p>`;
+      }
+    );
   }
 }
 
