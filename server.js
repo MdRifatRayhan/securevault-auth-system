@@ -388,6 +388,35 @@ app.post("/api/reset-password", csrfProtection, async (req, res) => {
 });
 
 app.get("/api/profile", auth, async (req, res) => {
+  app.get("/api/admin/stats", auth, async (req, res) => {
+
+  try {
+
+    const totalUsers =
+    await User.countDocuments();
+
+    res.json({
+
+      success: true,
+
+      totalUsers
+
+    });
+
+  }
+
+  catch {
+
+    res.json({
+
+      success: false,
+
+      message:
+      "Failed to load stats"
+
+    });
+  }
+});
 
   const user =
   await User.findOne({

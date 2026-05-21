@@ -414,6 +414,9 @@ Admin Panel
     <p>
       Welcome Admin
     </p>
+    <h3 id="totalUsers">
+  Total Users: ...
+</h3>
 
     <button
     type="button"
@@ -873,7 +876,7 @@ async function getProfile() {
 }
 
 /* ================= LOGOUT ================= */
-function openAdminPanel() {
+async function openAdminPanel() {
 
   dashboard.classList.add(
     "hidden"
@@ -882,6 +885,29 @@ function openAdminPanel() {
   adminPanel.classList.remove(
     "hidden"
   );
+
+  const token =
+  localStorage.getItem("token");
+
+  const res = await fetch(
+    "/api/admin/stats",
+    {
+
+      headers: {
+
+        Authorization: token
+      }
+    }
+  );
+
+  const data = await res.json();
+
+  if (data.success) {
+
+    totalUsers.innerText =
+    "Total Users: " +
+    data.totalUsers;
+  }
 }
 
 function closeAdminPanel() {
