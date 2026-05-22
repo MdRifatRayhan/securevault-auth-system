@@ -475,6 +475,60 @@ app.get(
 
   }
 );
+app.delete(
+  "/api/admin/delete-user/:username",
+  auth,
+  async (req, res) => {
+
+    try {
+
+      const username =
+      req.params.username;
+
+      if (
+        username === "admin"
+      ) {
+
+        return res.json({
+
+          success: false,
+
+          message:
+          "Cannot delete admin"
+
+        });
+      }
+
+      await User.deleteOne({
+        username
+      });
+
+      res.json({
+
+        success: true,
+
+        message:
+        "User deleted"
+
+      });
+
+    }
+
+    catch {
+
+      res.json({
+
+        success: false,
+
+        message:
+        "Delete failed"
+
+      });
+
+    }
+
+  }
+);
 
 /* STATIC */
 app.use(express.static(__dirname));
