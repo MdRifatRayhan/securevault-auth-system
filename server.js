@@ -1,3 +1,4 @@
+
 const express = require("express");
 const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
@@ -61,10 +62,6 @@ const User = mongoose.model("User", {
   username: String,
   email: String,
   password: String,
-  role: {
-  type: String,
-  default: "user"
-},
   resetToken: String,
   loginAttempts: { type: Number, default: 0 },
   lockUntil: { type: Number, default: 0 },
@@ -116,20 +113,7 @@ if (!strongPassword.test(password)) {
 }
 
   const hash = await bcrypt.hash(password, 10);
-  await User.create({
-
-  username,
-
-  email,
-
-  password: hash,
-
-  role:
-  username === "admin"
-  ? "admin"
-  : "user"
-
-});
+  await User.create({ username, email, password: hash });
 
   res.json({ success: true, message: "Registered" });
 });
@@ -286,29 +270,20 @@ app.post("/api/verify-otp", csrfProtection, async (req, res) => {
   otpUser = "";
   otpAttempts = 0;
 
+  const token = jwt.sign(
+
+    { user: loggedInUser },
+
+    SECRET,
+
+    { expiresIn: "1m" }
+
+  );
+
   const userData =
-await User.findOne({
-
-  username: loggedInUser
-
-});
-
- const token = jwt.sign(
-
-  {
-
-    user: loggedInUser,
-
-    role: userData.role
-
-  },
-
-  SECRET,
-
-  { expiresIn: "1m" }
-
-);
-
+  await User.findOne({
+    username: loggedInUser
+  });
 
   return res.json({
 
@@ -319,8 +294,6 @@ await User.findOne({
     token: token,
 
     username: loggedInUser,
-
-    role: userData.role,
 
     lastLogin:
     userData.lastLogin,
@@ -387,157 +360,32 @@ app.post("/api/reset-password", csrfProtection, async (req, res) => {
   res.json({ success: true, message: "Password reset successful" });
 });
 
-/* PROFILE */
-app.get("/api/profile", auth, (req, res) => {
+app.get("/api/profile", auth, async (req, res) => {
+
+  const user =
+  await User.findOne({
+    username: req.user
+  });
 
   res.json({
 
     success: true,
 
     message:
-    "Protected data accessed"
+    "Welcome, " + req.user,
+
+   lastLogin:
+user.lastLogin,
+
+loginHistory:
+user.loginHistory
 
   });
 
 });
 
-/* ADMIN STATS */
-app.get(
-  "/api/admin/stats",
-  auth,
-  async (req, res) => {
-
-    try {
-
-      const totalUsers =
-      await User.countDocuments();
-
-      res.json({
-
-        success: true,
-
-        totalUsers
-
-      });
-
-    }
-
-    catch {
-
-      res.json({
-
-        success: false,
-
-        message:
-        "Failed to load stats"
-
-      });
-
-    }
-
-  }
-);
-app.get(
-  "/api/admin/users",
-  auth,
-  async (req, res) => {
-
-    try {
-
-      const users =
-      await User.find(
-        {},
-        "username role"
-      );
-
-      res.json({
-
-        success: true,
-
-        users
-
-      });
-
-    }
-
-    catch {
-
-      res.json({
-
-        success: false,
-
-        message:
-        "Failed to load users"
-
-      });
-
-    }
-
-  }
-);
-app.delete(
-  "/api/admin/delete-user/:username",
-  auth,
-  async (req, res) => {
-
-    try {
-
-      const username =
-      req.params.username;
-
-      if (
-        username === "admin"
-      ) {
-
-        return res.json({
-
-          success: false,
-
-          message:
-          "Cannot delete admin"
-
-        });
-      }
-
-      await User.deleteOne({
-        username
-      });
-
-      res.json({
-
-        success: true,
-
-        message:
-        "User deleted"
-
-      });
-
-    }
-
-    catch {
-
-      res.json({
-
-        success: false,
-
-        message:
-        "Delete failed"
-
-      });
-
-    }
-
-  }
-);
-
-/* STATIC */
 app.use(express.static(__dirname));
 
-/* SERVER */
 app.listen(3000, () => {
-
-  console.log(
-    "Server running on http://localhost:3000"
-  );
-
+  console.log("Server running on http://localhost:3000");
 });

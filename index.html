@@ -286,7 +286,6 @@ body.dark .history-box{
   background:
   rgba(255,255,255,0.05);
 }
-
 </style>
 </head>
 
@@ -375,18 +374,6 @@ Resend OTP
     <button onclick="getProfile()">
       Check Protected Route
     </button>
-   <button
-id="adminBtn"
-class="hidden"
-onclick="openAdminPanel()">
-
-Admin Panel
-
-</button>
-
-Admin Panel
-
-</button>
 
     <button onclick="logout()">
       Logout
@@ -402,36 +389,6 @@ Admin Panel
 <input id="resetToken" placeholder="Enter token">
 <input id="newPass" type="password" placeholder="New password">
 <button onclick="resetPassword()">Reset Password</button>
-</div>
-<div id="adminPanel" class="hidden">
-
-  <div class="card">
-
-    <h2>
-      🛡 Admin Panel
-    </h2>
-
-    <p>
-      Welcome Admin
-    </p>
-    <h3 id="totalUsers">
-      <div id="userList">
-
-</div>
-  Total Users: ...
-</h3>
-<div id="userList"></div>
-
-    <button
-    type="button"
-    onclick="closeAdminPanel()">
-
-      Back
-
-    </button>
-
-  </div>
-
 </div>
 
 <p id="msg"></p>
@@ -648,50 +605,6 @@ showMsg(
   if (data.success) {
     setTimeout(showLogin, 1000);
   }
-  const usersRes =
-await fetch(
-  "/api/admin/users",
-  {
-
-    headers: {
-
-      Authorization: token
-    }
-  }
-);
-
-const usersData =
-await usersRes.json();
-userList.innerHTML =
-JSON.stringify(usersData);
-
-if (usersData.success) {
-
-  userList.innerHTML =
-  "<h3>Users</h3>";
-
- usersData.users.forEach(
-  (u) => {
-
-     userList.innerHTML +=
-`<div>
-
-  ${u.username}
-  (${u.role})
-
-  <button
-  onclick="deleteUser(
-    '${u.username}'
-  )">
-
-    Delete
-
-  </button>
-
-</div>`;
-    }
-  );
-}
 }
 
 /* ================= LOGIN ================= */
@@ -767,12 +680,6 @@ if (data.success) {
  otpBox.classList.add("hidden");
 
 dashboard.classList.remove("hidden");
-if (data.role === "admin") {
-
-  adminBtn.classList.remove(
-    "hidden"
-  );
-}
 
 welcomeText.innerText =
 "Welcome, " + data.username;
@@ -924,160 +831,6 @@ async function getProfile() {
 }
 
 /* ================= LOGOUT ================= */
-async function openAdminPanel() {
-
-  const userList =
-  document.getElementById(
-    "userList"
-  );
-
-  userList.innerHTML =
-  "Loading...";
-
-  dashboard.classList.add(
-    "hidden"
-  );
-
-  adminPanel.classList.remove(
-    "hidden"
-  );
-
-  const token =
-  localStorage.getItem(
-    "token"
-  );
-
-  /* TOTAL USERS */
-
-  const statsRes =
-  await fetch(
-    "/api/admin/stats",
-    {
-
-      headers: {
-
-        Authorization:
-        token
-      }
-    }
-  );
-
-  const statsData =
-  await statsRes.json();
-
-  if (statsData.success) {
-
-    totalUsers.innerText =
-    "Total Users: " +
-    statsData.totalUsers;
-  }
-
-  /* USER LIST */
-
-  const usersRes =
-  await fetch(
-    "/api/admin/users",
-    {
-
-      headers: {
-
-        Authorization:
-        token
-      }
-    }
-  );
-
-  const usersData =
-  await usersRes.json();
-
-  if (usersData.success) {
-
-    userList.innerHTML =
-    "<h3>Users</h3>";
-
-    usersData.users.forEach(
-      (u) => {
-
-        userList.innerHTML +=
-        `<div>
-
-          ${u.username}
-          (${u.role})
-
-          <button
-          onclick="deleteUser(
-            '${u.username}'
-          )">
-
-            Delete
-
-          </button>
-
-        </div>`;
-      }
-    );
-  }
-}
-
-function closeAdminPanel() {
-
-  adminPanel.classList.add(
-    "hidden"
-  );
-
-  dashboard.classList.remove(
-    "hidden"
-  );
-}
-async function deleteUser(
-  username
-) {
-
-  const confirmDelete =
-  confirm(
-
-    "Delete " +
-    username +
-    " ?"
-
-  );
-
-  if (!confirmDelete) {
-
-    return;
-  }
-
-  const token =
-  localStorage.getItem(
-    "token"
-  );
-
-  const res = await fetch(
-
-    "/api/admin/delete-user/" +
-    username,
-
-    {
-
-      method: "DELETE",
-
-      headers: {
-
-        Authorization:
-        token
-      }
-    }
-  );
-
-  const data =
-  await res.json();
-
-  alert(data.message);
-
-  if (data.success) {
-
-  }
-}
 function logout() {
 
   localStorage.removeItem("token");
@@ -1118,7 +871,6 @@ window.onload = async function () {
     const data = await res.json();
 
    if (data.success) {
-    console.log(data);
 
   loginBox.classList.add("hidden");
 
