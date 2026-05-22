@@ -925,12 +925,14 @@ async function getProfile() {
 
 /* ================= LOGOUT ================= */
 async function openAdminPanel() {
+
+  const userList =
+  document.getElementById(
+    "userList"
+  );
+
   userList.innerHTML =
-"Loading...";
-const userList =
-document.getElementById(
-  "userList"
-);
+  "Loading...";
 
   dashboard.classList.add(
     "hidden"
@@ -941,29 +943,33 @@ document.getElementById(
   );
 
   const token =
-  localStorage.getItem("token");
+  localStorage.getItem(
+    "token"
+  );
 
   /* TOTAL USERS */
 
-  const res = await fetch(
+  const statsRes =
+  await fetch(
     "/api/admin/stats",
     {
 
       headers: {
 
-        Authorization: token
+        Authorization:
+        token
       }
     }
   );
 
-  const data =
-  await res.json();
+  const statsData =
+  await statsRes.json();
 
-  if (data.success) {
+  if (statsData.success) {
 
     totalUsers.innerText =
     "Total Users: " +
-    data.totalUsers;
+    statsData.totalUsers;
   }
 
   /* USER LIST */
@@ -975,15 +981,14 @@ document.getElementById(
 
       headers: {
 
-        Authorization: token
+        Authorization:
+        token
       }
     }
   );
 
   const usersData =
   await usersRes.json();
-
-  console.log(usersData);
 
   if (usersData.success) {
 
@@ -994,12 +999,21 @@ document.getElementById(
       (u) => {
 
         userList.innerHTML +=
-        `<p>
+        `<div>
 
           ${u.username}
           (${u.role})
 
-        </p>`;
+          <button
+          onclick="deleteUser(
+            '${u.username}'
+          )">
+
+            Delete
+
+          </button>
+
+        </div>`;
       }
     );
   }
