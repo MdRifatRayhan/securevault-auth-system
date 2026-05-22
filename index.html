@@ -925,6 +925,8 @@ async function getProfile() {
 
 /* ================= LOGOUT ================= */
 async function openAdminPanel() {
+  userList.innerHTML =
+"Loading...";
 const userList =
 document.getElementById(
   "userList"
@@ -1060,7 +1062,6 @@ async function deleteUser(
 
   if (data.success) {
 
-    openAdminPanel();
   }
 }
 function logout() {
