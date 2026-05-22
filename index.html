@@ -661,6 +661,8 @@ await fetch(
 
 const usersData =
 await usersRes.json();
+userList.innerHTML =
+JSON.stringify(usersData);
 
 if (usersData.success) {
 
