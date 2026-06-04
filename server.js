@@ -1,5 +1,6 @@
 
 const express = require("express");
+require("dotenv").config();
 const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
@@ -53,9 +54,9 @@ next();
 }
 
 /* DB */
-mongoose.connect("mongodb+srv://admin:fI27hhJbWUQhh9XQ@cluster0.cw6dvem.mongodb.net/securevault?retryWrites=true&w=majority")
-.then(()=>console.log("MongoDB Connected"))
-.catch(err=>console.log(err));
+mongoose.connect(
+process.env.MONGO_URI
+);
 
 /* MODEL */
 const User = mongoose.model("User", {
