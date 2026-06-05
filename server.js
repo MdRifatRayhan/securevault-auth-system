@@ -54,9 +54,13 @@ next();
 }
 
 /* DB */
-mongoose.connect(
-process.env.MONGO_URI
-);
+mongoose.connect(process.env.MONGO_URI)
+.then(() => {
+  console.log("MongoDB Connected");
+})
+.catch((err) => {
+  console.error("MongoDB Error:", err);
+});
 
 /* MODEL */
 const User = mongoose.model("User", {
@@ -387,6 +391,8 @@ user.loginHistory
 
 app.use(express.static(__dirname));
 
-app.listen(3000, () => {
-  console.log("Server running on http://localhost:3000");
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
