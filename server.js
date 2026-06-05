@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 const csrfProtection = csurf({ cookie: true });
-const SECRET = "mysecretkey";
+const SECRET = process.env.JWT_SECRET;
 
 function auth(req, res, next) {
 
